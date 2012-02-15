@@ -37,10 +37,47 @@ Graph::Graph(const char * fileName)
 	readFromFile(fileName);	// Валидация происходит внутри этой функции.
 }
 
-void Graph::validate()
+void Graph::build(const int vertexCount, std::vector<Edge> edges)
 {
+	// Добавляем vertexCount узлов в граф.
+	for (int i = 0; i < vertexCount; i++)
+		nodes.push_back(Node(i));
+	// Строим связи между узлами.
+	for (int i = 0; i < edges.size(); i++)
+	{
+		Node * from = &nodes[(int)edges[i].from];
+		Node * to = &nodes[(int)edges[i].to];
+		nodes[from->number].edges.push_back(Edge(from, to, edges[i].weight));
+	}
+}
+
+void Graph::validate(const int vertexCount, std::vector<Edge> edges)
+{
+	bool negativeWeight = false;
+	bool loopExists = false;	
+	bool unknownNode = false;
+
+	for (int i = 0; i < edges.size(); i++)
+	{
+		// Есть ли дуги с отрицательным весом?
+		if (edges[i].weight < 0)
+			negativeWeight = true;
+		// Есть ли петли?
+		if (edges[i].from == edges[i].to)
+			loopExists = true;
+		// Не указана ли несуществующая вершина?
+		if ((int)edges[i].from < 0 || (int)edges[i].from >= vertexCount || (int)edges[i].to < 0 || (int)edges[i].to >= vertexCount)
+			unknownNode = true;
+	}
+
+	// Заполняем вектор ошибок.
 	errors.clear();
-	// TODO найти петли, дуги с отрицательным весом и т.д.
+	if (negativeWeight)
+		errors.push_back(Graph::ERROR_NEGATIVE_WEIGHT);
+	if (loopExists)
+		errors.push_back(Graph::ERROR_LOOP_EXISTS);
+	if (unknownNode)
+		errors.push_back(Graph::ERROR_UNKNOWN_NODE);
 }
 
 bool Graph::readFromFile(const char * fileName)
@@ -58,22 +95,23 @@ bool Graph::readFromFile(const char * fileName)
 	fscanf(file, "%d", &pathStart);
 	fscanf(file, "%d", &pathEnd);
 
-	// Добавляем n узлов в граф.
-	for (int i = 0; i < n; i++)
-		nodes.push_back(Node(i));
-
 	// Оставшаяся часть файла - информация о дугах.
+	std::vector<Edge> edges;
 	while (!feof(file))
 	{
 		int edgeStart = 0;
 		int edgeEnd = 0;
 		int edgeWeight = 0;
 		fscanf(file, "%d %d %d", &edgeStart, &edgeEnd, &edgeWeight);
-		nodes[edgeStart].edges.push_back(Edge(&nodes[edgeStart], &nodes[edgeEnd], edgeWeight));
+		edges.push_back(Edge((Node *)edgeStart, (Node *)edgeEnd, edgeWeight));	// При валидации вместо указателей - индексы.
 	}
 	fclose(file);
 
-	validate();
+	// Проверяем считанные данные и строим граф, если все нормально.
+	validate(n, edges);
+	nodes.clear();
+	if (errors.empty())
+		build(n, edges);
 	return true;
 }
 
