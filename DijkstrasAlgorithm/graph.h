@@ -12,6 +12,9 @@ struct Transition
 	Node * from;	// Начало дуги.
 	Node * to;		// Конец дуги.
 	int weight;		// Вес дуги.
+
+	Transition();
+	Transition(Node * _from, Node * _to, const int _weight);
 };
 
 /**
@@ -21,6 +24,9 @@ struct Node
 {
 	int number;								// Номер узла.
 	std::vector<Transition> transitions;	// Дуги, выходящие из этого узла.
+	
+	Node();
+	Node(const int _number);
 };
 
 /**
@@ -31,6 +37,13 @@ class Graph
 private:
 	std::vector<Node> nodes;	// Узлы графа.
 	std::vector<int> errors;	// Найденные "ошибки" в графе.
+
+	/**
+	 * Проверяет граф на удовлетворение ограничениям: неотрицательный вес дуг и отсутствие петель.
+	 * Соответствующим образом заполняется поле errors.
+	 */
+	void validate();
+
 public:
 	// Считанный граф удовлетворяет условиям.
 	static const int ERROR_NOT_EXISTS = 0;
@@ -42,17 +55,22 @@ public:
 	static const int ERROR_UNKNOWN_NODE = 3;
 
 	/**
+	 * Конструктор по умолчанию.
+	 */
+	Graph();
+
+	/**
+	 * Конструктор, в котором сразу строится граф по заданному файлу.
+	 * @param fileName - имя файла, с которого считывать.
+	 */
+	Graph(const char * fileName);
+
+	/**
 	 * Считывает граф из файла.
 	 * @param fileName - имя файла, с которого считывать.
 	 * @return - true, если граф считан удачно, иначе false.
 	 */
 	bool readFromFile(const char * fileName);
-
-	/**
-	 * Проверяет граф на удовлетворение ограничениям: неотрицательный вес дуг и отсутствие петель.
-	 * Соответствующим образом заполняется поле errors.
-	 */
-	void validate();
 
 	/**
 	 * Удовлетворяет ли граф условиям?
@@ -84,4 +102,7 @@ struct ExecutionState
 	Node * node;					// Состоянию ставится в соответствие узел графа.
 	int totalWeight;				// Длина пути до узла.
 	std::vector<Transition> path;	// Путь от начальной вершины до this->node.
+	
+	ExecutionState();
+	ExecutionState(const Node * _node);
 };
