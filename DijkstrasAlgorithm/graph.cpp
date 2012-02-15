@@ -125,6 +125,23 @@ std::vector<int> Graph::getErrors()
 	return errors;
 }
 
+char * Graph::getErrorString(const int errorCode)
+{
+	switch (errorCode)
+	{
+	case ERROR_NOT_EXISTS:
+		return "No errors were found";
+	case ERROR_NEGATIVE_WEIGHT:
+		return "An edge with negative weight was found";
+	case ERROR_LOOP_EXISTS:
+		return "A loop was found";
+	case ERROR_UNKNOWN_NODE:
+		return "A transition to (from) an undefined vertex was found";
+	default:
+		return "Unknown error";
+	}
+}
+
 std::vector<Edge> Graph::run(const int start, const int end)
 {
 	return std::vector<Edge>();

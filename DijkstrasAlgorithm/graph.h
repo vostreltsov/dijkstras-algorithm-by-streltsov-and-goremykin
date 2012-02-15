@@ -94,6 +94,13 @@ public:
 	std::vector<int> getErrors();
 
 	/**
+	 * Получение "ошибки" в виде сообщения.
+	 * @param errorCode - код ошибки.
+	 * @return - соответствующая строка.
+	 */
+	static char * getErrorString(const int errorCode);
+
+	/**
 	 * Выполнение алгоритма Дейкстры.
 	 * @param start - начальная вершина.
 	 * @param end - конечная вершина.
