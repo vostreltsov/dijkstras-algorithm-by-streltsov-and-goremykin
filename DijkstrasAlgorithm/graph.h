@@ -7,14 +7,14 @@ struct Node;
 /**
  * Дуга между двумя узлами.
  */
-struct Transition
+struct Edge
 {
 	Node * from;	// Начало дуги.
 	Node * to;		// Конец дуги.
 	int weight;		// Вес дуги.
 
-	Transition();
-	Transition(Node * _from, Node * _to, const int _weight);
+	Edge();
+	Edge(Node * _from, Node * _to, const int _weight);
 };
 
 /**
@@ -22,8 +22,8 @@ struct Transition
  */
 struct Node
 {
-	int number;								// Номер узла.
-	std::vector<Transition> transitions;	// Дуги, выходящие из этого узла.
+	int number;					// Номер узла.
+	std::vector<Edge> edges;	// Дуги, выходящие из этого узла.
 	
 	Node();
 	Node(const int _number);
@@ -90,7 +90,7 @@ public:
 	 * @param end - конечная вершина.
 	 * @return - вектор последовательных переходов из вершины start в вершину end.
 	 */
-	std::vector<Transition> run(const int start, const int end);
+	std::vector<Edge> run(const int start, const int end);
 };
 
 /**
@@ -99,9 +99,9 @@ public:
  */
 struct ExecutionState
 {
-	Node * node;					// Состоянию ставится в соответствие узел графа.
-	int totalWeight;				// Длина пути до узла.
-	std::vector<Transition> path;	// Путь от начальной вершины до this->node.
+	Node * node;			// Состоянию ставится в соответствие узел графа.
+	int totalWeight;		// Длина пути до узла.
+	std::vector<Edge> path;	// Путь от начальной вершины до this->node.
 	
 	ExecutionState();
 	ExecutionState(const Node * _node);

@@ -1,13 +1,13 @@
 #include "graph.h"
 
-Transition::Transition(Node * _from, Node * _to, const int _weight)
+Edge::Edge(Node * _from, Node * _to, const int _weight)
 {
 	from = _from;
 	to = _to;
 	weight = _weight;
 }
 
-Transition::Transition()
+Edge::Edge()
 {
 	from = NULL;
 	to = NULL;
@@ -45,7 +45,34 @@ void Graph::validate()
 
 bool Graph::readFromFile(const char * fileName)
 {
-	// TODO придумать формат файла, написать тут что-то.
+	int n = 0;			// Число вершин в графе.
+	int pathStart = 0;	// Начальная вершина маршрута.
+	int pathEnd = 0;	// Конечная вершина маршрута.
+
+	FILE * file = fopen(fileName, "r");
+	if (file == NULL)
+		return false;
+	
+	// Читаем количество узлов, номера начального и конечного узлов маршрута.
+	fscanf(file, "%d", &n);
+	fscanf(file, "%d", &pathStart);
+	fscanf(file, "%d", &pathEnd);
+
+	// Добавляем n узлов в граф.
+	for (int i = 0; i < n; i++)
+		nodes.push_back(Node(i));
+
+	// Оставшаяся часть файла - информация о дугах.
+	while (!feof(file))
+	{
+		int edgeStart = 0;
+		int edgeEnd = 0;
+		int edgeWeight = 0;
+		fscanf(file, "%d %d %d", &edgeStart, &edgeEnd, &edgeWeight);
+		nodes[edgeStart].edges.push_back(Edge(&nodes[edgeStart], &nodes[edgeEnd], edgeWeight));
+	}
+	fclose(file);
+
 	validate();
 	return true;
 }
@@ -60,9 +87,9 @@ std::vector<int> Graph::getErrors()
 	return errors;
 }
 
-std::vector<Transition> Graph::run(const int start, const int end)
+std::vector<Edge> Graph::run(const int start, const int end)
 {
-	return std::vector<Transition>();
+	return std::vector<Edge>();
 }
 
 /*----------------------------------------------------------------------------------------------------*/
