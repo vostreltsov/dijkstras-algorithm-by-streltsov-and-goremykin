@@ -20,7 +20,6 @@ struct Transition
 struct Node
 {
 	int number;								// Номер узла.
-	int tag;								// Тег, используется для хранения длины пути до данного узла.
 	std::vector<Transition> transitions;	// Дуги, выходящие из этого узла.
 };
 
@@ -39,11 +38,8 @@ public:
 	static const int ERROR_NEGATIVE_WEIGHT = 1;
 	// В считанном графе есть петли.
 	static const int ERROR_LOOP_EXISTS = 2;
-
-	/**
-	 * Выставляет теги в узлах равными -1.
-	 */
-	void resetTagValues();
+	// Дуга содержит номер узла, больший чем количество узлов.
+	static const int ERROR_UNKNOWN_NODE = 3;
 
 	/**
 	 * Считывает граф из файла.
@@ -77,4 +73,15 @@ public:
 	 * @return - вектор последовательных переходов из вершины start в вершину end.
 	 */
 	std::vector<Transition> run(const int start, const int end);
+};
+
+/**
+ * Вспомогательная структура для выполнения алгоритма.
+ * Объект такой структуры ставится в соответствие каждому узлу графа при выполнении алгоритма.
+ */
+struct ExecutionState
+{
+	Node * node;					// Состоянию ставится в соответствие узел графа.
+	int totalWeight;				// Длина пути до узла.
+	std::vector<Transition> path;	// Путь от начальной вершины до this->node.
 };
