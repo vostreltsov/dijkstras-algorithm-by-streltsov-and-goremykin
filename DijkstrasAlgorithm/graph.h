@@ -51,6 +51,8 @@ class Graph
 private:
 	std::vector<Node> nodes;	// Узлы графа.
 	std::vector<int> errors;	// Найденные "ошибки" в графе.
+	Node * startNode;			// Начальная вершина маршрута.
+	Node * endNode;				// Конечная вершина маршрута.
 
 	/**
 	 * Строит граф из считанных из файла данных.
@@ -64,8 +66,10 @@ private:
 	 * Соответствующим образом заполняется поле errors.
 	 * @param vertexCount - количество вершин.
 	 * @param edges - вектор объектов Edge. В этих объектах вместо указателей Node * используются индексы узлов.
+	 * @param start - начальная вершина маршрута.
+	 * @param end - конечная вершина маршрута.
 	 */
-	void validate(const int vertexCount, std::vector<Edge> edges);
+	void validate(const int vertexCount, std::vector<Edge> edges, const int start, const int end);
 
 public:
 	// Считанный граф удовлетворяет условиям.
@@ -76,6 +80,8 @@ public:
 	static const int ERROR_LOOP_EXISTS = 2;
 	// Дуга содержит номер узла, больший чем количество узлов.
 	static const int ERROR_UNKNOWN_NODE = 3;
+	// Указаны несуществующие границы пути.
+	static const int ERROR_PATH_BORDERS_NOT_EXIST = 4;
 
 	/**
 	 * Конструктор по умолчанию.

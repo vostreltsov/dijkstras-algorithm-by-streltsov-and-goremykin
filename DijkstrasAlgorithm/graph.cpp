@@ -30,6 +30,8 @@ Node::Node(const int _number)
 
 Graph::Graph()
 {
+	startNode = NULL;
+	endNode = NULL;
 }
 
 Graph::Graph(const char * fileName)
@@ -51,11 +53,12 @@ void Graph::build(const int vertexCount, std::vector<Edge> edges)
 	}
 }
 
-void Graph::validate(const int vertexCount, std::vector<Edge> edges)
+void Graph::validate(const int vertexCount, std::vector<Edge> edges, const int start, const int end)
 {
 	bool negativeWeight = false;
 	bool loopExists = false;	
 	bool unknownNode = false;
+	bool unknownBorders = (start < 0 || start >= vertexCount || end < 0 || end >= vertexCount);
 
 	for (int i = 0; i < edges.size(); i++)
 	{
@@ -78,6 +81,8 @@ void Graph::validate(const int vertexCount, std::vector<Edge> edges)
 		errors.push_back(Graph::ERROR_LOOP_EXISTS);
 	if (unknownNode)
 		errors.push_back(Graph::ERROR_UNKNOWN_NODE);
+	if (unknownBorders)
+		errors.push_back(Graph::ERROR_PATH_BORDERS_NOT_EXIST);
 }
 
 bool Graph::readFromFile(const char * fileName)
@@ -108,10 +113,19 @@ bool Graph::readFromFile(const char * fileName)
 	fclose(file);
 
 	// Проверяем считанные данные и строим граф, если все нормально.
-	validate(n, edges);
+	validate(n, edges, pathStart, pathEnd);
 	nodes.clear();
 	if (errors.empty())
+	{
 		build(n, edges);
+		startNode = &nodes[pathStart];
+		endNode = &nodes[pathEnd];
+	}
+	else
+	{
+		startNode = NULL;
+		endNode = NULL;
+	}
 	return true;
 }
 
@@ -137,6 +151,8 @@ char * Graph::getErrorString(const int errorCode)
 		return "A loop was found";
 	case ERROR_UNKNOWN_NODE:
 		return "A transition to (from) an undefined vertex was found";
+	case ERROR_PATH_BORDERS_NOT_EXIST:
+		return "Start or end node of the path does not exist in the graph";
 	default:
 		return "Unknown error";
 	}
