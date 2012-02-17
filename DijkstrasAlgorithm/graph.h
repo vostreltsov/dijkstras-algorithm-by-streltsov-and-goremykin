@@ -15,6 +15,7 @@ struct Edge
 
 	Edge();
 	Edge(Node * _from, Node * _to, const int _weight);
+	bool operator==(const Edge & other) const;
 };
 
 /**
@@ -134,11 +135,12 @@ public:
 
 	/**
 	 * Генерация файла с описанием графа на языке dot.
-	 * Пройденные вершины обозначаются пунктиром, непройденные - сплошной линией. Текущий переход выделяется красным цветом.
+	 * Пройденные вершины обозначаются пунктиром, непройденные - сплошной линией.
+	 * Текущий переход выделяется красным цветом, пройденные переходы синим цветом, непройденные - черным.
 	 * @param fileName - имя dot-файла на выходе.
 	 * @param states - указатель на вектор текущего состояния выполнения.
 	 * @param currentEdge - указатель на текущую дугу графа.
 	 * @return - true, если файл успешно сгенерирован, иначе false.
 	 */
-	bool generateDotCode(const char * fileName, const std::vector<ExecutionState> * states, const Edge * currentEdge);
+	bool generateDotCode(const char * fileName, const std::vector<ExecutionState *> * states, const Edge currentEdge);
 };
