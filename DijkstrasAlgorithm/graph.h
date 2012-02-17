@@ -128,11 +128,9 @@ public:
 
 	/**
 	 * Выполнение алгоритма Дейкстры.
-	 * @param start - начальная вершина.
-	 * @param end - конечная вершина.
-	 * @return - вектор последовательных переходов из вершины start в вершину end.
+	 * @return - объект ExecutionState, содержащий вектор последовательных переходов из вершины start в вершину end и суммарную длину пути.
 	 */
-	std::vector<Edge> run(const int start, const int end);
+	ExecutionState run();
 
 	/**
 	 * Генерация файла с описанием графа на языке dot.
