@@ -41,6 +41,7 @@ Graph::Graph(const char * fileName)
 
 void Graph::build(const int vertexCount, std::vector<Edge> edges)
 {
+	nodes.clear();
 	// Добавляем vertexCount узлов в граф.
 	for (int i = 0; i < vertexCount; i++)
 		nodes.push_back(Node(i));
@@ -114,7 +115,6 @@ bool Graph::readFromFile(const char * fileName)
 
 	// Проверяем считанные данные и строим граф, если все нормально.
 	validate(n, edges, pathStart, pathEnd);
-	nodes.clear();
 	if (errors.empty())
 	{
 		build(n, edges);
@@ -160,6 +160,22 @@ char * Graph::getErrorString(const int errorCode)
 
 std::vector<Edge> Graph::run(const int start, const int end)
 {
+	// Создаем объект ExecutionState для каждого узла графа и запоминаем начальное состояние.
+	std::vector<ExecutionState *> states;
+	ExecutionState * startState = NULL;
+	for (int i = 0; i < nodes.size(); i++)
+	{
+		ExecutionState * newState = new ExecutionState(&nodes[i]);
+		if (newState->node == startNode)
+			startState = newState;
+		states.push_back(newState);
+	}
+
+	// Выполняем алгоритм.
+
+	// Очищаем выделенную память.
+	for (int i = 0; i < states.size(); i++)
+		delete states[i];
 	return std::vector<Edge>();
 }
 
@@ -172,9 +188,11 @@ bool generateDotCode(const char * fileName, const std::vector<ExecutionState> * 
 ExecutionState::ExecutionState()
 {
 	node = NULL;
+	passed = false;
 }
 
 ExecutionState::ExecutionState(const Node * _node)
 {
 	node = const_cast<Node *>(_node);
+	passed = false;
 }
