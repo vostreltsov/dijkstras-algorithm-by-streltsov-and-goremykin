@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <conio.h>
+#include <locale>
 #include <crtdbg.h>
 #include "graph.h"
 
@@ -11,6 +12,7 @@
 
 int main(int argc, char *argv[])
 {
+	setlocale(LC_ALL, "rus");
 
 #ifdef _DEBUG
 	TestSuite tests;
