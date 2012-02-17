@@ -1,5 +1,8 @@
+#define _CRTDBG_MAP_ALLOC
+
 #include <stdio.h>
 #include <conio.h>
+#include <crtdbg.h>
 #include "graph.h"
 
 #ifdef _DEBUG
@@ -13,6 +16,7 @@ int main(int argc, char *argv[])
 	TestSuite tests;
 	tests.run();
 	_getch();
+	_CrtDumpMemoryLeaks();
 #else
 	// TODO считать файл, запустить алгоритм и выдать результат.
 	/*Graph G("D:\\1.txt");
