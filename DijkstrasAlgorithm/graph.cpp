@@ -158,7 +158,7 @@ char * Graph::getErrorString(const int errorCode)
 	}
 }
 
-std::vector<Edge> Graph::run(const int start, const int end)
+ExecutionState Graph::run()
 {
 	// Создаем объект ExecutionState для каждого узла графа и запоминаем начальное состояние.
 	std::vector<ExecutionState *> states;
@@ -170,13 +170,52 @@ std::vector<Edge> Graph::run(const int start, const int end)
 			startState = newState;
 		states.push_back(newState);
 	}
+	startState->totalWeight = 0;
 
 	// Выполняем алгоритм.
+	ExecutionState * currentState = startState;	// Вершина с минимальной меткой.
+	while (currentState != NULL)
+	{
+		// Просматриваем всех соседей текущей вершины.
+		for (int i = 0; i < currentState->node->edges.size(); i++)
+		{
+			Edge edge = currentState->node->edges[i];
+			ExecutionState * destState = NULL;	// Cостояние, соответствующее конечной вершине ребра.
+			for (int j = 0; destState == NULL && j < states.size(); j++)
+				if (states[j]->node == edge.to)
+					destState = states[j];
+			// Перезаписываем путь до конечной вершины текущей дуги.
+			if (destState->totalWeight == -1 || destState->totalWeight > currentState->totalWeight + edge.weight)
+			{
+				destState->path = currentState->path;
+				destState->path.push_back(edge);
+				destState->totalWeight = currentState->totalWeight + edge.weight;
+			}
+		}		
+		// Помечаем вершину как пройденную и выбираем новую вершину с минимальной меткой.
+		currentState->passed = true;
+		currentState = NULL;
+		for (int i = 0; i < states.size(); i++)
+		{
+			ExecutionState * tmp = states[i];
+			if (!tmp->passed)
+			{
+				// Выбираем текущую вершину, если она пока что равна NULL или найдена вершина с меньшей меткой.
+				if (currentState == NULL || (tmp->totalWeight != -1 && currentState->totalWeight > tmp->totalWeight))
+					currentState = tmp;
+			}
+		}
+	}
 
-	// Очищаем выделенную память.
+	// Формируем результат и очищаем выделенную память.
+	ExecutionState result;
 	for (int i = 0; i < states.size(); i++)
+	{
+		if (states[i]->node == endNode)
+			result = *states[i];
 		delete states[i];
-	return std::vector<Edge>();
+	}
+	return result;
 }
 
 bool generateDotCode(const char * fileName, const std::vector<ExecutionState> * states, const Edge * currentEdge)
@@ -188,11 +227,13 @@ bool generateDotCode(const char * fileName, const std::vector<ExecutionState> * 
 ExecutionState::ExecutionState()
 {
 	node = NULL;
+	totalWeight = -1;
 	passed = false;
 }
 
 ExecutionState::ExecutionState(const Node * _node)
 {
 	node = const_cast<Node *>(_node);
+	totalWeight = -1;
 	passed = false;
 }
