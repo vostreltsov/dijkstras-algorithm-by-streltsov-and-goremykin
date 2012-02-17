@@ -37,6 +37,7 @@ struct ExecutionState
 {
 	Node * node;			// Состоянию ставится в соответствие узел графа.
 	int totalWeight;		// Длина пути до узла.
+	bool passed;			// Пройден ли узел.
 	std::vector<Edge> path;	// Путь от начальной вершины до this->node.
 	
 	ExecutionState();
@@ -53,6 +54,11 @@ private:
 	std::vector<int> errors;	// Найденные "ошибки" в графе.
 	Node * startNode;			// Начальная вершина маршрута.
 	Node * endNode;				// Конечная вершина маршрута.
+
+#ifdef _DEBUG
+	//class TestSuite;
+	friend class TestSuite;
+#endif
 
 	/**
 	 * Строит граф из считанных из файла данных.
