@@ -147,6 +147,10 @@ std::vector<Edge> Graph::run(const int start, const int end)
 	return std::vector<Edge>();
 }
 
+bool generateDotCode(const char * fileName, const std::vector<ExecutionState> * states, const Edge * currentEdge)
+{
+	return true;
+}
 /*----------------------------------------------------------------------------------------------------*/
 
 ExecutionState::ExecutionState()

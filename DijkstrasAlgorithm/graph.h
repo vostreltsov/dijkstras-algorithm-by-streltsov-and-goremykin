@@ -30,6 +30,20 @@ struct Node
 };
 
 /**
+ * Вспомогательная структура для выполнения алгоритма.
+ * Объект такой структуры ставится в соответствие каждому узлу графа при выполнении алгоритма.
+ */
+struct ExecutionState
+{
+	Node * node;			// Состоянию ставится в соответствие узел графа.
+	int totalWeight;		// Длина пути до узла.
+	std::vector<Edge> path;	// Путь от начальной вершины до this->node.
+	
+	ExecutionState();
+	ExecutionState(const Node * _node);
+};
+
+/**
  * Граф.
  */
 class Graph
@@ -107,18 +121,14 @@ public:
 	 * @return - вектор последовательных переходов из вершины start в вершину end.
 	 */
 	std::vector<Edge> run(const int start, const int end);
-};
 
-/**
- * Вспомогательная структура для выполнения алгоритма.
- * Объект такой структуры ставится в соответствие каждому узлу графа при выполнении алгоритма.
- */
-struct ExecutionState
-{
-	Node * node;			// Состоянию ставится в соответствие узел графа.
-	int totalWeight;		// Длина пути до узла.
-	std::vector<Edge> path;	// Путь от начальной вершины до this->node.
-	
-	ExecutionState();
-	ExecutionState(const Node * _node);
+	/**
+	 * Генерация файла с описанием графа на языке dot.
+	 * Пройденные вершины обозначаются пунктиром, непройденные - сплошной линией. Текущий переход выделяется красным цветом.
+	 * @param fileName - имя dot-файла на выходе.
+	 * @param states - указатель на вектор текущего состояния выполнения.
+	 * @param currentEdge - указатель на текущую дугу графа.
+	 * @return - true, если файл успешно сгенерирован, иначе false.
+	 */
+	bool generateDotCode(const char * fileName, const std::vector<ExecutionState> * states, const Edge * currentEdge);
 };
