@@ -89,6 +89,8 @@ public:
 	static const int ERROR_UNKNOWN_NODE = 3;
 	// Указаны несуществующие границы пути.
 	static const int ERROR_PATH_BORDERS_NOT_EXIST = 4;
+	// Не удалось открыть файл.
+	static const int ERROR_COULD_NOT_OPEN_FILE = 5;
 
 	/**
 	 * Конструктор по умолчанию.
@@ -129,9 +131,11 @@ public:
 
 	/**
 	 * Выполнение алгоритма Дейкстры.
+	 * @param fileNamePrefix - префикс для имен генерируемых файлов, включая полный путь до них.
+	 * @param dotFilesGenerated - указатель на вектор, в который запишутся имена сгенерированных файлов. Строки выделяются динамически, необходимо очистить память после вызова функции.
 	 * @return - объект ExecutionState, содержащий вектор последовательных переходов из вершины start в вершину end и суммарную длину пути.
 	 */
-	ExecutionState run();
+	ExecutionState run(const char * fileNamePrefix, std::vector<char *> * dotFilesGenerated);
 
 	/**
 	 * Генерация файла с описанием графа на языке dot.

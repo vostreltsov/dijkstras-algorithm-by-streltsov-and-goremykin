@@ -34,7 +34,7 @@ public:
 		G.build(1, edges);
 		G.startNode = &G.nodes[0];
 		G.endNode = &G.nodes[0];
-		ExecutionState res = G.run();
+		ExecutionState res = G.run("C:\\step", NULL);
 		assertTrue(res.totalWeight == 0, "Неверная длина пути (тест № 0)");
 		assertTrue(res.path.empty(), "Неверное количество переходов (тест № 0)");
 	}
@@ -50,7 +50,7 @@ public:
 		G.build(2, edges);
 		G.startNode = &G.nodes[0];
 		G.endNode = &G.nodes[1];
-		ExecutionState res = G.run();
+		ExecutionState res = G.run("C:\\step", NULL);
 
 		assertTrue(res.totalWeight == 10, "Неверная длина пути (тест № 1)");
 		assertTrue(res.path.size() == 1, "Неверное количество переходов (тест № 1)");
@@ -75,14 +75,14 @@ public:
 		G.build(6, edges);
 		G.startNode = &G.nodes[0];
 		G.endNode = &G.nodes[5];
-		ExecutionState res = G.run();
+		ExecutionState res = G.run("C:\\step", NULL);
 		assertTrue(res.totalWeight == 11, "Неверная длина пути (тест № 2)");
 		assertTrue(res.path.size() == 2, "Неверное количество переходов (тест № 2)");
 		assertTrue(res.path[0].weight == 9 && res.path[1].weight == 2, "Найдены неправильные переходы (тест № 2)");		
 
 		G.startNode = &G.nodes[0];
 		G.endNode = &G.nodes[3];
-		res = G.run();
+		res = G.run("C:\\step", NULL);
 		assertTrue(res.totalWeight == 20, "Неверная длина пути (тест № 2)");
 		assertTrue(res.path.size() == 2, "Неверное количество переходов (тест № 2)");
 		assertTrue(res.path[0].weight == 9 && res.path[1].weight == 11, "Найдены неправильные переходы (тест № 2)");	
@@ -102,7 +102,7 @@ public:
 		G.build(4, edges);
 		G.startNode = &G.nodes[0];
 		G.endNode = &G.nodes[3];
-		ExecutionState res = G.run();
+		ExecutionState res = G.run("C:\\step", NULL);
 		assertTrue(res.totalWeight == 8, "Неверная длина пути (тест № 3)");
 		assertTrue(res.path.size() == 3, "Неверное количество переходов (тест № 3)");
 		assertTrue(res.path[0].weight == 1 && res.path[1].weight == 2 && res.path[2].weight == 5, "Найдены неправильные переходы (тест № 3)");			

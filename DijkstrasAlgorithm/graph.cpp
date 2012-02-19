@@ -99,7 +99,11 @@ bool Graph::readFromFile(const char * fileName)
 
 	FILE * file;
 	if (fopen_s(&file, fileName, "r"))
+	{
+		errors.clear();
+		errors.push_back(Graph::ERROR_COULD_NOT_OPEN_FILE);
 		return false;
+	}
 	
 	// Читаем количество узлов, номера начального и конечного узлов маршрута.
 	fscanf_s(file, "%d", &n);
@@ -158,12 +162,14 @@ char * Graph::getErrorString(const int errorCode)
 		return "A transition to (from) an undefined vertex was found";
 	case ERROR_PATH_BORDERS_NOT_EXIST:
 		return "Start or end node of the path does not exist in the graph";
+	case ERROR_COULD_NOT_OPEN_FILE:
+		return "Could not open file";
 	default:
 		return "Unknown error";
 	}
 }
 
-ExecutionState Graph::run()
+ExecutionState Graph::run(const char * fileNamePrefix, std::vector<char *> * dotFilesGenerated)
 {
 	int stepCount = 0;
 	char dotFileName[256] = "";
@@ -179,7 +185,14 @@ ExecutionState Graph::run()
 		states.push_back(newState);
 	}
 	startState->totalWeight = 0;
-	sprintf_s(dotFileName, 256, "C:\\step%d.dot", stepCount++);
+	// Генерируем файл в начале выполнения алгоритма.
+	sprintf_s(dotFileName, 256, "%s%d.dot", fileNamePrefix, stepCount++);
+	if (dotFilesGenerated != NULL)
+	{
+		char * tmp = new char[256];
+		strcpy_s(tmp, 256, dotFileName);
+		dotFilesGenerated->push_back(tmp);
+	}
 	generateDotCode(dotFileName, &states, Edge());
 
 	// Выполняем алгоритм.
@@ -199,8 +212,15 @@ ExecutionState Graph::run()
 				destState->path.push_back(edge);
 				destState->totalWeight = currentState->totalWeight + edge.weight;
 			}
-			
-			sprintf_s(dotFileName, 256, "C:\\step%d.dot", stepCount++);
+
+			// Генерируем файл в середине выполнения алгоритма.
+			sprintf_s(dotFileName, 256, "%s%d.dot", fileNamePrefix, stepCount++);
+			if (dotFilesGenerated != NULL)
+			{
+				char * tmp = new char[256];
+				strcpy_s(tmp, 256, dotFileName);
+				dotFilesGenerated->push_back(tmp);
+			}
 			generateDotCode(dotFileName, &states, edge);
 
 		}		
@@ -218,7 +238,15 @@ ExecutionState Graph::run()
 			}
 		}
 	}
-	sprintf_s(dotFileName, 256, "C:\\step%d.dot", stepCount++);
+
+	// Генерируем файл в конце выполнения алгоритма.
+	sprintf_s(dotFileName, 256, "%s%d.dot", fileNamePrefix, stepCount++);
+	if (dotFilesGenerated != NULL)
+	{
+		char * tmp = new char[256];
+		strcpy_s(tmp, 256, dotFileName);
+		dotFilesGenerated->push_back(tmp);
+	}
 	generateDotCode(dotFileName, &states, Edge());
 
 	// Формируем результат и очищаем выделенную память.
