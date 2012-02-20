@@ -62,7 +62,7 @@ void Graph::build(const int vertexCount, std::vector<Edge> edges)
 void Graph::validate(const int vertexCount, std::vector<Edge> edges, const int start, const int end)
 {
 	bool negativeWeight = false;
-	bool loopExists = false;	
+	bool loopExists = false;
 	bool unknownNode = false;
 	bool unknownBorders = (start < 0 || start >= vertexCount || end < 0 || end >= vertexCount);
 
@@ -104,7 +104,7 @@ bool Graph::readFromFile(const char * fileName)
 		errors.push_back(Graph::ERROR_COULD_NOT_OPEN_FILE);
 		return false;
 	}
-	
+
 	// Читаем количество узлов, номера начального и конечного узлов маршрута.
 	fscanf_s(file, "%d", &n);
 	fscanf_s(file, "%d", &pathStart);
@@ -193,7 +193,7 @@ ExecutionState Graph::run(const char * fileNamePrefix, std::vector<char *> * dot
 		strcpy_s(tmp, 256, dotFileName);
 		dotFilesGenerated->push_back(tmp);
 	}
-	generateDotCode(dotFileName, &states, Edge());
+	generateDotCodeForStep(dotFileName, &states, Edge());
 
 	// Выполняем алгоритм.
 	ExecutionState * currentState = startState;	// Вершина с минимальной меткой.
@@ -221,9 +221,9 @@ ExecutionState Graph::run(const char * fileNamePrefix, std::vector<char *> * dot
 				strcpy_s(tmp, 256, dotFileName);
 				dotFilesGenerated->push_back(tmp);
 			}
-			generateDotCode(dotFileName, &states, edge);
+			generateDotCodeForStep(dotFileName, &states, edge);
 
-		}		
+		}
 		// Помечаем вершину как пройденную и выбираем новую вершину с минимальной меткой.
 		currentState->passed = true;
 		currentState = NULL;
@@ -247,20 +247,32 @@ ExecutionState Graph::run(const char * fileNamePrefix, std::vector<char *> * dot
 		strcpy_s(tmp, 256, dotFileName);
 		dotFilesGenerated->push_back(tmp);
 	}
-	generateDotCode(dotFileName, &states, Edge());
+	generateDotCodeForStep(dotFileName, &states, Edge());
 
-	// Формируем результат и очищаем выделенную память.
+	// Формируем результат.
 	ExecutionState result;
 	for (int i = 0; i < states.size(); i++)
-	{
 		if (states[i]->node == endNode)
 			result = *states[i];
-		delete states[i];
+
+	// Генерируем файл, в котором отображается оптимальный путь.
+	sprintf_s(dotFileName, 256, "%s%d.dot", fileNamePrefix, stepCount++);
+	if (dotFilesGenerated != NULL)
+	{
+		char * tmp = new char[256];
+		strcpy_s(tmp, 256, dotFileName);
+		dotFilesGenerated->push_back(tmp);
 	}
+	generateDotCodeForResult(dotFileName, &states, &result);
+
+	//  Очищаем выделенную память.
+	for (int i = 0; i < states.size(); i++)
+		delete states[i];
+
 	return result;
 }
 
-bool Graph::generateDotCode(const char * fileName, const std::vector<ExecutionState *> * states, const Edge currentEdge)
+bool Graph::generateDotCodeForStep(const char * fileName, const std::vector<ExecutionState *> * states, const Edge currentEdge)
 {
 	FILE * file;
 	if (fopen_s(&file, fileName, "w"))
@@ -274,15 +286,15 @@ bool Graph::generateDotCode(const char * fileName, const std::vector<ExecutionSt
 		ExecutionState * state = (*states)[i];
 		char * str = new char[256];
 		sprintf_s(str, 256, "\"%d\\n len=%d\"", state->node->number, state->totalWeight);
-		
+
 		nodestrings.push_back(str);
-		
+
 		char tmp[256] = "";
 		strcpy_s(tmp, 256, str);
 		if (state->passed)
 			strcat_s(tmp, 256, "[style=dotted]");	// Выделяем пройденное состояние пунктиром.
 		strcat_s(tmp, 256, ";");
-		
+
 		fprintf_s(file, "%s\n", tmp);
 	}
 	// Задаем переходы.
@@ -304,6 +316,67 @@ bool Graph::generateDotCode(const char * fileName, const std::vector<ExecutionSt
 				sprintf_s(extra, 256, "[label=\"%d\", color=red];", edges[j].weight);	// Выделяем текущую дугу красным цветом.
 			else if ((*states)[edges[j].from->number]->passed)
 				sprintf_s(extra, 256, "[label=\"%d\", color=blue];", edges[j].weight);	// Выделяем пройденную дугу синим цветом.
+			else
+				sprintf_s(extra, 256, "[label=\"%d\"];", edges[j].weight);
+			strcat_s(str, 256, extra);
+			fprintf_s(file, "%s\n", str);
+		}
+	}
+	fprintf_s(file, "};");
+
+	fclose(file);
+	for (int i = 0; i < nodestrings.size(); i++)
+		delete nodestrings[i];
+	return true;
+}
+
+bool Graph::generateDotCodeForResult(const char * fileName, const std::vector<ExecutionState *> * states, ExecutionState * result)
+{
+	FILE * file;
+	if (fopen_s(&file, fileName, "w"))
+		return false;
+
+	fprintf_s(file, "digraph {\nrankdir = LR;\n");
+	// Задаем узлы.
+	std::vector<char *> nodestrings;
+	for (int i = 0; i < states->size(); i++)
+	{
+		ExecutionState * state = (*states)[i];
+		char * str = new char[256];
+		sprintf_s(str, 256, "\"%d\\n len=%d\"", state->node->number, state->totalWeight);
+
+		nodestrings.push_back(str);
+
+		char tmp[256] = "";
+		strcpy_s(tmp, 256, str);
+		//if (state->passed)
+		//	strcat_s(tmp, 256, "[style=dotted]");	// Выделяем пройденное состояние пунктиром.
+		strcat_s(tmp, 256, ";");
+
+		fprintf_s(file, "%s\n", tmp);
+	}
+	// Задаем переходы.
+	for (int i = 0; i < states->size(); i++)
+	{
+		ExecutionState * state = (*states)[i];
+		std::vector<Edge> edges = state->node->edges;
+		for (int j = 0; j < edges.size(); j++)
+		{
+			char from[64] = "";
+			char to[64] = "";
+			char str[256] = "";
+			strcpy_s(from, 64, nodestrings[edges[j].from->number]);
+			strcpy_s(to, 64, nodestrings[edges[j].to->number]);
+			sprintf_s(str, 256, "%s -> %s", from, to);
+
+			char extra[256] = "";
+			bool belongsToResult = false;
+			for (int k = 0; !belongsToResult && k < result->path.size(); k++)
+				if (result->path[k] == edges[j])
+					belongsToResult = true;
+
+			if (belongsToResult)
+				sprintf_s(extra, 256, "[label=\"%d\", color=green];", edges[j].weight);	// Выделяем дугу, принадлежащую пути, зеленым цветом.
 			else
 				sprintf_s(extra, 256, "[label=\"%d\"];", edges[j].weight);
 			strcat_s(str, 256, extra);

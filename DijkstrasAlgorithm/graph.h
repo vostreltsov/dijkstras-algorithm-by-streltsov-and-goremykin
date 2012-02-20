@@ -25,7 +25,7 @@ struct Node
 {
 	int number;					// Номер узла.
 	std::vector<Edge> edges;	// Дуги, выходящие из этого узла.
-	
+
 	Node();
 	Node(const int _number);
 };
@@ -40,7 +40,7 @@ struct ExecutionState
 	int totalWeight;		// Длина пути до узла.
 	bool passed;			// Пройден ли узел.
 	std::vector<Edge> path;	// Путь от начальной вершины до this->node.
-	
+
 	ExecutionState();
 	ExecutionState(const Node * _node);
 };
@@ -138,7 +138,7 @@ public:
 	ExecutionState run(const char * fileNamePrefix, std::vector<char *> * dotFilesGenerated);
 
 	/**
-	 * Генерация файла с описанием графа на языке dot.
+	 * Генерация файла с описанием графа (на каком-то шаге алгоритма) на языке dot.
 	 * Пройденные вершины обозначаются пунктиром, непройденные - сплошной линией.
 	 * Текущий переход выделяется красным цветом, пройденные переходы синим цветом, непройденные - черным.
 	 * @param fileName - имя dot-файла на выходе.
@@ -146,5 +146,15 @@ public:
 	 * @param currentEdge - указатель на текущую дугу графа.
 	 * @return - true, если файл успешно сгенерирован, иначе false.
 	 */
-	bool generateDotCode(const char * fileName, const std::vector<ExecutionState *> * states, const Edge currentEdge);
+	bool generateDotCodeForStep(const char * fileName, const std::vector<ExecutionState *> * states, const Edge currentEdge);
+
+	/**
+	 * Генерация файла с описанием графа (для найденного результата) на языке dot.
+	 * Переходы, принадлежащие результирующему пути, выделяются зеленым цветом, остальные - черным.
+	 * @param fileName - имя dot-файла на выходе.
+	 * @param states - указатель на вектор текущего состояния выполнения.
+	 * @param result - указатель на результат работы алгоритма.
+	 * @return - true, если файл успешно сгенерирован, иначе false.
+	 */
+	bool generateDotCodeForResult(const char * fileName, const std::vector<ExecutionState *> * states, ExecutionState * result);
 };
