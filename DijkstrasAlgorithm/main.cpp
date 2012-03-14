@@ -43,7 +43,10 @@ int main(int argc, char *argv[])
 	if (!fopen_s(&file, argv[2], "w"))
 	{
 		for (int i = 0; i < dotFilesGenerated->size(); i++)
-			fprintf_s(file, "%s\n", (*dotFilesGenerated)[i]);
+			if (i != dotFilesGenerated->size() - 1)
+				fprintf_s(file, "%s\n", (*dotFilesGenerated)[i]);
+			else
+				fprintf_s(file, "%s", (*dotFilesGenerated)[i]);
 		fclose(file);
 	} else
 		printf("Could not create output file.");
