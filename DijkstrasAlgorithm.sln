@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DijkstrasAlgorithm", "DijkstrasAlgorithm\DijkstrasAlgorithm.vcxproj", "{CB843432-E076-4885-A131-73F724767148}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GUI", "GUI\GUI.vcxproj", "{69C4D31F-8719-4488-96B1-57BFCA22EC1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +15,10 @@ Global
 		{CB843432-E076-4885-A131-73F724767148}.Debug|Win32.Build.0 = Debug|Win32
 		{CB843432-E076-4885-A131-73F724767148}.Release|Win32.ActiveCfg = Release|Win32
 		{CB843432-E076-4885-A131-73F724767148}.Release|Win32.Build.0 = Release|Win32
+		{69C4D31F-8719-4488-96B1-57BFCA22EC1D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{69C4D31F-8719-4488-96B1-57BFCA22EC1D}.Debug|Win32.Build.0 = Debug|Win32
+		{69C4D31F-8719-4488-96B1-57BFCA22EC1D}.Release|Win32.ActiveCfg = Release|Win32
+		{69C4D31F-8719-4488-96B1-57BFCA22EC1D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
