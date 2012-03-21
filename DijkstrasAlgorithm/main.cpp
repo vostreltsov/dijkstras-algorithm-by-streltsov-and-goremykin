@@ -4,6 +4,7 @@
 #include <conio.h>
 #include <locale>
 #include <crtdbg.h>
+#include <string>
 #include "graph.h"
 
 #ifdef _DEBUG
@@ -35,7 +36,7 @@ int main(int argc, char *argv[])
 			printf("%s\n", Graph::getErrorString(errors[i]));
 		return 0;
 	}
-	std::vector<char *> * dotFilesGenerated = new std::vector<char *>;
+	std::vector<std::string> * dotFilesGenerated = new std::vector<std::string>;
 	G->run(argv[3], dotFilesGenerated);
 
 	// Формируем выходной файл.
@@ -53,8 +54,6 @@ int main(int argc, char *argv[])
 
 	// Очищаем память.
 	delete G;
-	for (int i = 0; i < dotFilesGenerated->size(); i++)
-		delete (*dotFilesGenerated)[i];
 	delete dotFilesGenerated;
 	return 0;
 #endif

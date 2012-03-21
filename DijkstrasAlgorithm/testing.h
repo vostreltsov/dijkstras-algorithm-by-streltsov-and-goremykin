@@ -18,6 +18,13 @@ private:
 			printf("FAIL: %s\n", failMessage);
 		}
 	}
+
+	void cleanUp(std::vector<std::string> dotFilesGenerated)
+	{
+		for (std::vector<std::string>::const_iterator iter = dotFilesGenerated.cbegin(); iter != dotFilesGenerated.cend(); iter++)
+			unlink(iter->c_str());
+	}
+
 public:
 	TestSuite()
 	{
@@ -30,11 +37,14 @@ public:
 	{
 		Graph G;
 		std::vector<Edge> edges;
+		std::vector<std::string> dotFilesGenerated;
 
 		G.build(1, edges);
 		G.startNode = &G.nodes[0];
 		G.endNode = &G.nodes[0];
-		ExecutionState res = G.run("C:\\step", NULL);
+		ExecutionState res = G.run("C:\\step", &dotFilesGenerated);
+		cleanUp(dotFilesGenerated);
+
 		assertTrue(res.totalWeight == 0, "Неверная длина пути (тест № 0)");
 		assertTrue(res.path.empty(), "Неверное количество переходов (тест № 0)");
 	}
@@ -44,13 +54,16 @@ public:
 	{
 		Graph G;
 		std::vector<Edge> edges;
+		std::vector<std::string> dotFilesGenerated;
+
 		edges.push_back(Edge((Node *)0, (Node *)1, 15));
 		edges.push_back(Edge((Node *)0, (Node *)1, 10));
 
 		G.build(2, edges);
 		G.startNode = &G.nodes[0];
 		G.endNode = &G.nodes[1];
-		ExecutionState res = G.run("C:\\step", NULL);
+		ExecutionState res = G.run("C:\\step", &dotFilesGenerated);
+		cleanUp(dotFilesGenerated);
 
 		assertTrue(res.totalWeight == 10, "Неверная длина пути (тест № 1)");
 		assertTrue(res.path.size() == 1, "Неверное количество переходов (тест № 1)");
@@ -62,6 +75,8 @@ public:
 	{
 		Graph G;
 		std::vector<Edge> edges;
+		std::vector<std::string> dotFilesGenerated;
+
 		edges.push_back(Edge((Node *)0, (Node *)1, 7));
 		edges.push_back(Edge((Node *)0, (Node *)2, 9));
 		edges.push_back(Edge((Node *)0, (Node *)5, 14));
@@ -75,14 +90,18 @@ public:
 		G.build(6, edges);
 		G.startNode = &G.nodes[0];
 		G.endNode = &G.nodes[5];
-		ExecutionState res = G.run("C:\\step", NULL);
+		ExecutionState res = G.run("C:\\step", &dotFilesGenerated);
+		cleanUp(dotFilesGenerated);
+
 		assertTrue(res.totalWeight == 11, "Неверная длина пути (тест № 2)");
 		assertTrue(res.path.size() == 2, "Неверное количество переходов (тест № 2)");
 		assertTrue(res.path[0].weight == 9 && res.path[1].weight == 2, "Найдены неправильные переходы (тест № 2)");
 
 		G.startNode = &G.nodes[0];
 		G.endNode = &G.nodes[3];
-		res = G.run("C:\\step", NULL);
+		res = G.run("C:\\step", &dotFilesGenerated);
+		cleanUp(dotFilesGenerated);
+
 		assertTrue(res.totalWeight == 20, "Неверная длина пути (тест № 2)");
 		assertTrue(res.path.size() == 2, "Неверное количество переходов (тест № 2)");
 		assertTrue(res.path[0].weight == 9 && res.path[1].weight == 11, "Найдены неправильные переходы (тест № 2)");
@@ -93,6 +112,8 @@ public:
 	{
 		Graph G;
 		std::vector<Edge> edges;
+		std::vector<std::string> dotFilesGenerated;
+
 		edges.push_back(Edge((Node *)0, (Node *)1, 10));
 		edges.push_back(Edge((Node *)0, (Node *)2, 1));
 		edges.push_back(Edge((Node *)1, (Node *)3, 5));
@@ -102,7 +123,9 @@ public:
 		G.build(4, edges);
 		G.startNode = &G.nodes[0];
 		G.endNode = &G.nodes[3];
-		ExecutionState res = G.run("C:\\step", NULL);
+		ExecutionState res = G.run("C:\\step", &dotFilesGenerated);
+		cleanUp(dotFilesGenerated);
+
 		assertTrue(res.totalWeight == 8, "Неверная длина пути (тест № 3)");
 		assertTrue(res.path.size() == 3, "Неверное количество переходов (тест № 3)");
 		assertTrue(res.path[0].weight == 1 && res.path[1].weight == 2 && res.path[2].weight == 5, "Найдены неправильные переходы (тест № 3)");

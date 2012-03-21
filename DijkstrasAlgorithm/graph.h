@@ -1,6 +1,7 @@
 #pragma once
 #include <stdio.h>
 #include <vector>
+#include <string>
 
 struct Node;
 
@@ -135,26 +136,28 @@ public:
 	 * @param dotFilesGenerated - указатель на вектор, в который запишутся имена сгенерированных файлов. Строки выделяются динамически, необходимо очистить память после вызова функции.
 	 * @return - объект ExecutionState, содержащий вектор последовательных переходов из вершины start в вершину end и суммарную длину пути.
 	 */
-	ExecutionState run(const char * fileNamePrefix, std::vector<char *> * dotFilesGenerated);
+	ExecutionState run(const char * fileNamePrefix, std::vector<std::string> * dotFilesGenerated);
 
 	/**
 	 * Генерация файла с описанием графа (на каком-то шаге алгоритма) на языке dot.
 	 * Пройденные вершины обозначаются пунктиром, непройденные - сплошной линией.
 	 * Текущий переход выделяется красным цветом, пройденные переходы синим цветом, непройденные - черным.
-	 * @param fileName - имя dot-файла на выходе.
+	 * @param fileNamePrefix - префикс имени dot-файла на выходе, содержащий полный путь.
+	 * @param stepCount - указатель переменную-счетчик сгенерированных файлов.
 	 * @param states - указатель на вектор текущего состояния выполнения.
-	 * @param currentEdge - указатель на текущую дугу графа.
-	 * @return - true, если файл успешно сгенерирован, иначе false.
+	 * @param currentEdge - текущая дуга графа.
+	 * @return - имя сгенерированного файла.
 	 */
-	bool generateDotCodeForStep(const char * fileName, const std::vector<ExecutionState *> * states, const Edge currentEdge);
+	std::string Graph::generateDotCodeForStep(const char * fileNamePrefix, int * stepCount, const std::vector<ExecutionState *> * states, const Edge currentEdge);
 
 	/**
 	 * Генерация файла с описанием графа (для найденного результата) на языке dot.
 	 * Переходы, принадлежащие результирующему пути, выделяются зеленым цветом, остальные - черным.
-	 * @param fileName - имя dot-файла на выходе.
+	 * @param fileNamePrefix - префикс имени dot-файла на выходе, содержащий полный путь.
+	 * @param stepCount - указатель переменную-счетчик сгенерированных файлов.
 	 * @param states - указатель на вектор текущего состояния выполнения.
 	 * @param result - указатель на результат работы алгоритма.
-	 * @return - true, если файл успешно сгенерирован, иначе false.
+	 * @return - имя сгенерированного файла.
 	 */
-	bool generateDotCodeForResult(const char * fileName, const std::vector<ExecutionState *> * states, ExecutionState * result);
+	std::string generateDotCodeForResult(const char * fileNamePrefix, int * stepCount, const std::vector<ExecutionState *> * states, ExecutionState * result);
 };
