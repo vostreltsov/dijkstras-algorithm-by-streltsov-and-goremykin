@@ -23,7 +23,7 @@ GUI::~GUI()
 void GUI::btnSearch_clicked(bool checked)
 {
 	// Проверка входных данных на соответствие формату.
-	QRegExp regex("\\s*(\\d+)\\s*(\\d+)\\s*(\\d+)\\s*");
+	QRegExp regex("\\s*(\\d+)\\s*(\\d+)\\s*(-?\\d+)\\s*");
 	QTextDocument * doc = ui.teGraph->document();
 	bool failed = false;
 	int maxVertex = -1;
@@ -57,7 +57,7 @@ void GUI::btnSearch_clicked(bool checked)
 			QMessageBox::warning(NULL, QString("Ошибка"), QString("Что-то пошло не так"));
 			return;
 		}
-		fprintf_s(file, "%d %d %d\n", maxVertex + 1, ui.leStartVertex->text().toInt(), ui.leEndVertex->text().toInt());
+		fprintf_s(file, "%d\n %d %d %d\n", (int)doc->lineCount(), maxVertex + 1, ui.leStartVertex->text().toInt(), ui.leEndVertex->text().toInt());
 		for (int i = 0; !failed && i < doc->lineCount(); i++)
 		{
 			char buf[256];
@@ -83,29 +83,43 @@ void GUI::btnSearch_clicked(bool checked)
 			QMessageBox::warning(NULL, QString("Ошибка"), QString("Что-то пошло не так"));
 			return;
 		}
-		while (!feof(file))
+		char buf[256] = "";
+		int linesCount = 0;
+		fgets(buf, 256, file);
+		fscanf_s(file, "%d\n", &linesCount);
+		buf[strlen(buf) - 1] = '\0';
+		if (strcmp(buf, "fail") == 0)
 		{
-			char dotFileName[256] = "";
-			char tmp = '\0';
-			int len = 0;
-			while (tmp != '\n' && !feof(file))
+			// Выводим сообщение об ошибках.
+			QString errors;
+			for (int i = 0; i < linesCount; i++)
 			{
-				tmp = fgetc(file);
-				dotFileName[len] = tmp;
-				len++;
+				fgets(buf, 256, file);
+				errors += QString(buf);
+				if (i != linesCount - 1)
+					errors += QString("\n");
 			}
-			dotFileName[len - 1] = '\0';
-			QStringList args;
-			args << QString("-Tpng") << QString("-o") + QString(dotFileName) + QString(".png") << QString(dotFileName);
-			QProcess::execute(dotExeFileName, args);
-			_unlink(dotFileName);
-			images.push_back(QString(dotFileName) + QString(".png"));
-
+			QMessageBox::warning(NULL, QString("Ошибки во входных данных"), errors);
+			ui.labGraphImage->clear();
+		}
+		else
+		{
+			// Визуализируем шаги алгоритма.
+			for (int i = 0; i < linesCount; i++)
+			{
+				fgets(buf, 256, file);
+				buf[strlen(buf) - 1] = '\0';
+				QStringList args;
+				args << QString("-Tpng") << QString("-o") + QString(buf) + QString(".png") << QString(buf);
+				QProcess::execute(dotExeFileName, args);
+				_unlink(buf);
+				images.push_back(QString(buf) + QString(".png"));
+			}
+			// Показываем начальный шаг.
+			ui.labGraphImage->setPixmap(QPixmap(images[0]));
 		}
 		fclose(file);
 		_unlink(outputFileName.toLocal8Bit().data());
-		// Показываем начальный шаг.
-		ui.labGraphImage->setPixmap(QPixmap(images[0]));
 	}
 	else
 		QMessageBox::warning(NULL, QString("Ошибка"), QString("Список дуг не соответствует формату x y w"));

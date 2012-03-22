@@ -93,6 +93,7 @@ void Graph::validate(const int vertexCount, std::vector<Edge> edges, const int s
 
 bool Graph::readFromFile(const char * fileName)
 {
+	int m = 0;			// Число дуг в графе.
 	int n = 0;			// Число вершин в графе.
 	int pathStart = 0;	// Начальная вершина маршрута.
 	int pathEnd = 0;	// Конечная вершина маршрута.
@@ -106,13 +107,11 @@ bool Graph::readFromFile(const char * fileName)
 	}
 
 	// Читаем количество узлов, номера начального и конечного узлов маршрута.
-	fscanf_s(file, "%d", &n);
-	fscanf_s(file, "%d", &pathStart);
-	fscanf_s(file, "%d", &pathEnd);
+	fscanf_s(file, "%d\n %d %d %d\n", &m, &n, &pathStart, &pathEnd);
 
 	// Оставшаяся часть файла - информация о дугах.
 	std::vector<Edge> edges;
-	while (!feof(file))
+	for (int i = 0; i < m; i++)
 	{
 		int edgeStart = 0;
 		int edgeEnd = 0;

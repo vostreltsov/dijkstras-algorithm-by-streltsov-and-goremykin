@@ -27,34 +27,37 @@ int main(int argc, char *argv[])
 		printf("Too few command line arguments. Example usage: qwe.exe \"C:\\in.txt\" \"C:\\out.txt\" \"C:\\dotfileprefix\".\n");
 		return 0;
 	}
-	Graph * G = new Graph(argv[1]);
-	if (G->error_exists())
-	{
-		printf("Errors found:\n");
-		std::vector<int> errors = G->getErrors();
-		for (int i = 0; i < errors.size(); i++)
-			printf("%s\n", Graph::getErrorString(errors[i]));
-		return 0;
-	}
-	std::vector<std::string> * dotFilesGenerated = new std::vector<std::string>;
-	G->run(argv[3], dotFilesGenerated);
-
-	// Формируем выходной файл.
 	FILE * file;
+	Graph * G = new Graph(argv[1]);
 	if (!fopen_s(&file, argv[2], "w"))
 	{
-		for (int i = 0; i < dotFilesGenerated->size(); i++)
-			if (i != dotFilesGenerated->size() - 1)
+		if (G->error_exists())
+		{
+			// Пишем в файл найденные ошибки.
+			printf("Errors found:\n");
+			std::vector<int> errors = G->getErrors();
+			fprintf_s(file, "fail\n%d\n", (int)errors.size());
+			for (int i = 0; i < errors.size(); i++)
+			{
+				printf("%s\n", Graph::getErrorString(errors[i]));
+				fprintf_s(file, "%s\n", Graph::getErrorString(errors[i]));
+			}
+		}
+		else
+		{
+			// Пишем в файл результаты работы алгоритма.
+			std::vector<std::string> * dotFilesGenerated = new std::vector<std::string>;
+			G->run(argv[3], dotFilesGenerated);
+			fprintf_s(file, "success\n%d\n", (int)dotFilesGenerated->size());
+			for (int i = 0; i < dotFilesGenerated->size(); i++)
 				fprintf_s(file, "%s\n", (*dotFilesGenerated)[i]);
-			else
-				fprintf_s(file, "%s", (*dotFilesGenerated)[i]);
+			delete dotFilesGenerated;
+		}
 		fclose(file);
 	} else
 		printf("Could not create output file.");
 
-	// Очищаем память.
 	delete G;
-	delete dotFilesGenerated;
 	return 0;
 #endif
 }
