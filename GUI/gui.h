@@ -10,10 +10,9 @@
 #include <qgraphicsscene.h>
 #include <qstring.h>
 #include <qvector.h>
-#include <process.h>
+#include <qprocess.h>
+#include <qsettings.h>
 #include "ui_gui.h"
-
-#define DOT_EXE_FILENAME "C:\\Program Files (x86)\\Graphviz 2.28\\bin\\dot.exe"
 
 class GUI : public QMainWindow
 {
@@ -25,6 +24,7 @@ public:
 
 private:
 	Ui::GUIClass ui;
+	QString dotExeFileName;		// Абсолютный путь к dot.exe.
 	QString appPath;			// Абсолютный путь до исполняемого файла.
 	QVector<QString> images;	// Сгенерированные картинки для текущего введенного графа.
 	int currentImage;			// Индекс текущей картинки.

@@ -9,6 +9,8 @@ GUI::GUI(QWidget *parent, Qt::WFlags flags)
 	connect(ui.btnPrevious, SIGNAL(clicked(bool)), this, SLOT(btnPrevious_clicked(bool)));
 	connect(ui.btnNext, SIGNAL(clicked(bool)), this, SLOT(btnNext_clicked(bool)));
 	appPath = QCoreApplication::applicationDirPath() + "/";
+	QSettings settings(appPath + QString("settings.ini"), QSettings::IniFormat);
+	dotExeFileName = settings.value("Main/dotpath", "C:/Program Files (x86)/Graphviz 2.28/bin/dot.exe").toString();
 }
 
 GUI::~GUI()
@@ -48,11 +50,9 @@ void GUI::btnSearch_clicked(bool checked)
 		images.clear();
 		currentImage = 0;
 		// Генерация входного файла.
-		char inputFileName[256];
-		strcpy(inputFileName, appPath.toLocal8Bit().data());
-		strcat(inputFileName, "in.txt");
+		QString inputFileName = appPath + QString("in.txt");
 		FILE * file;
-		if (fopen_s(&file, inputFileName, "w") != 0)
+		if (fopen_s(&file, inputFileName.toLocal8Bit().data(), "w") != 0)
 		{
 			QMessageBox::warning(NULL, QString("Ошибка"), QString("Что-то пошло не так"));
 			return;
@@ -70,19 +70,15 @@ void GUI::btnSearch_clicked(bool checked)
 		}
 		fclose(file);
 		// Запуск алгоритма.
-		char daExeFileName[256];
-		char outputFileName[256];
-		char prefixFileName[256];
-		strcpy(daExeFileName, appPath.toLocal8Bit().data());
-		strcpy(outputFileName, daExeFileName);
-		strcpy(prefixFileName, daExeFileName);
-		strcat(daExeFileName, "DijkstrasAlgorithm.exe");
-		strcat(outputFileName, "out.txt");
-		strcat(prefixFileName, "step");
-		_spawnl(_P_WAIT, daExeFileName, "DijkstrasAlgorithm.exe", inputFileName, outputFileName, prefixFileName, NULL);
-		_unlink(inputFileName);
+		QString daExeFileName = appPath + QString("DijkstrasAlgorithm.exe");
+		QString outputFileName = appPath + QString("out.txt");
+		QString prefixFileName = appPath + QString("step");
+		QStringList args;
+		args << inputFileName << outputFileName << prefixFileName;
+		QProcess::execute(daExeFileName, args);
+		_unlink(inputFileName.toLocal8Bit().data());
 		// Подготовка данных для визуализации.
-		if (fopen_s(&file, outputFileName, "r") != 0)
+		if (fopen_s(&file, outputFileName.toLocal8Bit().data(), "r") != 0)
 		{
 			QMessageBox::warning(NULL, QString("Ошибка"), QString("Что-то пошло не так"));
 			return;
@@ -99,18 +95,15 @@ void GUI::btnSearch_clicked(bool checked)
 				len++;
 			}
 			dotFileName[len - 1] = '\0';
-			char param1[256] = "";
-			char param2[256] = "";
-			char pngFileName[256] = "";
-			sprintf_s(param1, 256, "-o \"%s.png\"", dotFileName);
-			sprintf_s(param2, 256, "-Kdot \"%s\"", dotFileName);
-			sprintf_s(pngFileName, 256, "%s.png", dotFileName);
-			_spawnl(_P_WAIT, DOT_EXE_FILENAME, "dot.exe", "-Tpng", param1, param2, NULL);
+			QStringList args;
+			args << QString("-Tpng") << QString("-o") + QString(dotFileName) + QString(".png") << QString(dotFileName);
+			QProcess::execute(dotExeFileName, args);
 			_unlink(dotFileName);
-			images.push_back(pngFileName);
+			images.push_back(QString(dotFileName) + QString(".png"));
+
 		}
 		fclose(file);
-		_unlink(outputFileName);
+		_unlink(outputFileName.toLocal8Bit().data());
 		// Показываем начальный шаг.
 		ui.labGraphImage->setPixmap(QPixmap(images[0]));
 	}
