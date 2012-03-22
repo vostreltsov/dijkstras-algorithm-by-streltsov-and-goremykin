@@ -230,7 +230,7 @@ ExecutionState Graph::run(const char * fileNamePrefix, std::vector<std::string> 
 	// Формируем результат.
 	ExecutionState result;
 	for (int i = 0; i < states.size(); i++)
-		if (states[i]->node == endNode)
+		if (!states[i]->path.empty() && states[i]->path.front().from == startNode && states[i]->path.back().to == endNode)
 			result = *states[i];
 
 	// Генерируем файл, в котором отображается оптимальный путь.

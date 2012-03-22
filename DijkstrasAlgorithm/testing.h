@@ -45,7 +45,7 @@ public:
 		ExecutionState res = G.run("C:\\step", &dotFilesGenerated);
 		cleanUp(dotFilesGenerated);
 
-		assertTrue(res.totalWeight == 0, "Неверная длина пути (тест № 0)");
+		assertTrue(res.totalWeight == -1, "Неверная длина пути (тест № 0)");
 		assertTrue(res.path.empty(), "Неверное количество переходов (тест № 0)");
 	}
 
@@ -105,6 +105,14 @@ public:
 		assertTrue(res.totalWeight == 20, "Неверная длина пути (тест № 2)");
 		assertTrue(res.path.size() == 2, "Неверное количество переходов (тест № 2)");
 		assertTrue(res.path[0].weight == 9 && res.path[1].weight == 11, "Найдены неправильные переходы (тест № 2)");
+
+		G.startNode = &G.nodes[5];
+		G.endNode = &G.nodes[1];
+		res = G.run("C:\\step", &dotFilesGenerated);
+		cleanUp(dotFilesGenerated);
+
+		assertTrue(res.totalWeight == -1, "Неверная длина пути (тест № 2)");
+		assertTrue(res.path.empty(), "Неверное количество переходов (тест № 2)");
 	}
 
 	// Путь до одной из вершин напрямую длинее, чем в обход.
