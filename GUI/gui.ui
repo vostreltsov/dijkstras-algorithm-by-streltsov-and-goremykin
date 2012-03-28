@@ -138,6 +138,60 @@
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>713</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Файл</string>
+    </property>
+    <addaction name="btnMenuOpen"/>
+    <addaction name="btnMenuSave"/>
+    <addaction name="separator"/>
+    <addaction name="btnMenuExit"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Справка</string>
+    </property>
+    <addaction name="btnMenuHelp"/>
+    <addaction name="separator"/>
+    <addaction name="btnMenuAbout"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_2"/>
+  </widget>
+  <action name="btnMenuOpen">
+   <property name="text">
+    <string>Открыть граф..</string>
+   </property>
+  </action>
+  <action name="btnMenuSave">
+   <property name="text">
+    <string>Сохранить граф...</string>
+   </property>
+  </action>
+  <action name="btnMenuExit">
+   <property name="text">
+    <string>Выход</string>
+   </property>
+  </action>
+  <action name="btnMenuHelp">
+   <property name="text">
+    <string>Помощь...</string>
+   </property>
+  </action>
+  <action name="btnMenuAbout">
+   <property name="text">
+    <string>О программе...</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>

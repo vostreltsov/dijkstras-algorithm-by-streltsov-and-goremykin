@@ -34,6 +34,12 @@ private slots:
 	void btnSearch_clicked(bool checked);
 	void btnPrevious_clicked(bool checked);
 	void btnNext_clicked(bool checked);
+	void btnMenuOpen_triggered(bool checked);
+	void btnMenuSave_triggered(bool checked);
+	void btnMenuExit_triggered(bool checked);
+	void btnMenuHelp_triggered(bool checked);
+	void btnMenuAbout_triggered(bool checked);
+
 };
 
 #endif // GUI_H

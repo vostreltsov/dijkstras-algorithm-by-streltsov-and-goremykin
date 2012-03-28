@@ -8,9 +8,18 @@ GUI::GUI(QWidget *parent, Qt::WFlags flags)
 	connect(ui.btnSearch, SIGNAL(clicked(bool)), this, SLOT(btnSearch_clicked(bool)));
 	connect(ui.btnPrevious, SIGNAL(clicked(bool)), this, SLOT(btnPrevious_clicked(bool)));
 	connect(ui.btnNext, SIGNAL(clicked(bool)), this, SLOT(btnNext_clicked(bool)));
+
+	connect(ui.btnMenuOpen, SIGNAL(triggered(bool)), this, SLOT(btnMenuOpen_triggered(bool)));
+	connect(ui.btnMenuSave, SIGNAL(triggered(bool)), this, SLOT(btnMenuSave_triggered(bool)));
+	connect(ui.btnMenuExit, SIGNAL(triggered(bool)), this, SLOT(btnMenuExit_triggered(bool)));
+	connect(ui.btnMenuHelp, SIGNAL(triggered(bool)), this, SLOT(btnMenuHelp_triggered(bool)));
+	connect(ui.btnMenuAbout, SIGNAL(triggered(bool)), this, SLOT(btnMenuAbout_triggered(bool)));
+
 	appPath = QCoreApplication::applicationDirPath() + "/";
 	QSettings settings(appPath + QString("settings.ini"), QSettings::IniFormat);
 	dotExeFileName = settings.value("Main/dotpath", "C:/Program Files (x86)/Graphviz 2.28/bin/dot.exe").toString();
+	if (dotExeFileName[1] != QChar(':'))
+		dotExeFileName = appPath + dotExeFileName;
 }
 
 GUI::~GUI()
@@ -144,4 +153,29 @@ void GUI::btnNext_clicked(bool checked)
 	if (currentImage == images.size())
 		currentImage = 0;
 	ui.labGraphImage->setPixmap(QPixmap(images[currentImage]));
+}
+
+void GUI::btnMenuOpen_triggered(bool checked)
+{
+
+}
+
+void GUI::btnMenuSave_triggered(bool checked)
+{
+
+}
+
+void GUI::btnMenuExit_triggered(bool checked)
+{
+	close();
+}
+
+void GUI::btnMenuHelp_triggered(bool checked)
+{
+
+}
+
+void GUI::btnMenuAbout_triggered(bool checked)
+{
+
 }
