@@ -2,6 +2,7 @@
 #define GUI_H
 
 #include <QtGui/QMainWindow>
+#include <qstring.h>
 #include <qtextcodec.h>
 #include <qtextobject.h>
 #include <qtextdocument.h>
@@ -12,6 +13,10 @@
 #include <qvector.h>
 #include <qprocess.h>
 #include <qsettings.h>
+#include <qiodevice.h>
+#include <qfile.h>
+#include <qtextstream.h>
+ #include <qfiledialog.h>
 #include "ui_gui.h"
 
 class GUI : public QMainWindow
