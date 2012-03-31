@@ -152,7 +152,7 @@ void GUI::btnSearch_clicked(bool checked)
 		QMessageBox::warning(NULL, QString("Ошибка"), QString("Не удалось сгенерировать входной файл для работы алгоритма."));
 		return;
 	}
-	fprintf_s(file, "%d\n %d %d %d\n", (int)lines.size(), maxVertex + 1, ui.leStartVertex->text().toInt(), ui.leEndVertex->text().toInt());
+	fprintf_s(file, "%d\n %d %d\n", (int)lines.size(), ui.leStartVertex->text().toInt(), ui.leEndVertex->text().toInt());
 	for (QList<QString>::const_iterator iter = lines.constBegin(); iter != lines.constEnd(); iter++)
 		fprintf_s(file, "%s\n", iter->toLocal8Bit().data());
 	fclose(file);
@@ -189,7 +189,6 @@ void GUI::btnSearch_clicked(bool checked)
 				errors += QString("\n");
 		}
 		QMessageBox::warning(NULL, QString("Ошибки во входных данных."), errors);
-		ui.labGraphImage->clear();
 	}
 	else
 	{

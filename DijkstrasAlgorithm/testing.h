@@ -39,9 +39,11 @@ public:
 		std::vector<Edge> edges;
 		std::vector<std::string> dotFilesGenerated;
 
-		G.build(1, edges);
-		G.startNode = &G.nodes[0];
-		G.endNode = &G.nodes[0];
+		edges.push_back(Edge((Node *)0, (Node *)0, 10));
+
+		G.build(edges);
+		G.startNode = G.nodes.find(0)->second;
+		G.endNode = G.nodes.find(0)->second;
 		ExecutionState res = G.run("C:\\step", &dotFilesGenerated);
 		cleanUp(dotFilesGenerated);
 
@@ -59,9 +61,9 @@ public:
 		edges.push_back(Edge((Node *)0, (Node *)1, 15));
 		edges.push_back(Edge((Node *)0, (Node *)1, 10));
 
-		G.build(2, edges);
-		G.startNode = &G.nodes[0];
-		G.endNode = &G.nodes[1];
+		G.build(edges);
+		G.startNode = G.nodes.find(0)->second;
+		G.endNode = G.nodes.find(1)->second;
 		ExecutionState res = G.run("C:\\step", &dotFilesGenerated);
 		cleanUp(dotFilesGenerated);
 
@@ -87,9 +89,9 @@ public:
 		edges.push_back(Edge((Node *)3, (Node *)4, 6));
 		edges.push_back(Edge((Node *)5, (Node *)4, 9));
 
-		G.build(6, edges);
-		G.startNode = &G.nodes[0];
-		G.endNode = &G.nodes[5];
+		G.build(edges);
+		G.startNode = G.nodes.find(0)->second;
+		G.endNode = G.nodes.find(5)->second;
 		ExecutionState res = G.run("C:\\step", &dotFilesGenerated);
 		cleanUp(dotFilesGenerated);
 
@@ -97,8 +99,8 @@ public:
 		assertTrue(res.path.size() == 2, "Неверное количество переходов (тест № 2)");
 		assertTrue(res.path[0].weight == 9 && res.path[1].weight == 2, "Найдены неправильные переходы (тест № 2)");
 
-		G.startNode = &G.nodes[0];
-		G.endNode = &G.nodes[3];
+		G.startNode = G.nodes.find(0)->second;
+		G.endNode = G.nodes.find(3)->second;
 		res = G.run("C:\\step", &dotFilesGenerated);
 		cleanUp(dotFilesGenerated);
 
@@ -106,8 +108,8 @@ public:
 		assertTrue(res.path.size() == 2, "Неверное количество переходов (тест № 2)");
 		assertTrue(res.path[0].weight == 9 && res.path[1].weight == 11, "Найдены неправильные переходы (тест № 2)");
 
-		G.startNode = &G.nodes[5];
-		G.endNode = &G.nodes[1];
+		G.startNode = G.nodes.find(5)->second;
+		G.endNode = G.nodes.find(1)->second;
 		res = G.run("C:\\step", &dotFilesGenerated);
 		cleanUp(dotFilesGenerated);
 
@@ -128,9 +130,9 @@ public:
 		edges.push_back(Edge((Node *)2, (Node *)1, 2));
 		edges.push_back(Edge((Node *)2, (Node *)3, 20));
 
-		G.build(4, edges);
-		G.startNode = &G.nodes[0];
-		G.endNode = &G.nodes[3];
+		G.build(edges);
+		G.startNode = G.nodes.find(0)->second;
+		G.endNode = G.nodes.find(3)->second;
 		ExecutionState res = G.run("C:\\step", &dotFilesGenerated);
 		cleanUp(dotFilesGenerated);
 

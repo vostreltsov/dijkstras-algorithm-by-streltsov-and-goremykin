@@ -1,5 +1,6 @@
 #pragma once
 #include <stdio.h>
+#include <map>
 #include <vector>
 #include <string>
 
@@ -52,32 +53,29 @@ struct ExecutionState
 class Graph
 {
 private:
-	std::vector<Node> nodes;	// Узлы графа.
-	std::vector<int> errors;	// Найденные "ошибки" в графе.
-	Node * startNode;			// Начальная вершина маршрута.
-	Node * endNode;				// Конечная вершина маршрута.
+	std::map<int, Node *> nodes;	// Узлы графа.
+	std::vector<int> errors;		// Найденные "ошибки" в графе.
+	Node * startNode;				// Начальная вершина маршрута.
+	Node * endNode;					// Конечная вершина маршрута.
 
 #ifdef _DEBUG
-	//class TestSuite;
 	friend class TestSuite;
 #endif
 
 	/**
 	 * Строит граф из считанных из файла данных.
-	 * @param vertexCount - количество вершин.
 	 * @param edges - вектор объектов Edge. В этих объектах вместо указателей Node * используются индексы узлов.
 	 */
-	void build(const int vertexCount, std::vector<Edge> edges);
+	void build(std::vector<Edge> edges);
 
 	/**
 	 * Проверяет считанные данные на удовлетворение ограничениям: неотрицательный вес дуг и отсутствие петель.
 	 * Соответствующим образом заполняется поле errors.
-	 * @param vertexCount - количество вершин.
 	 * @param edges - вектор объектов Edge. В этих объектах вместо указателей Node * используются индексы узлов.
 	 * @param start - начальная вершина маршрута.
 	 * @param end - конечная вершина маршрута.
 	 */
-	void validate(const int vertexCount, std::vector<Edge> edges, const int start, const int end);
+	void validate(std::vector<Edge> edges, const int start, const int end);
 
 public:
 	// Считанный граф удовлетворяет условиям.
@@ -86,12 +84,10 @@ public:
 	static const int ERROR_NEGATIVE_WEIGHT = 1;
 	// В считанном графе есть петли.
 	static const int ERROR_LOOP_EXISTS = 2;
-	// Дуга содержит номер узла, больший чем количество узлов.
-	static const int ERROR_UNKNOWN_NODE = 3;
 	// Указаны несуществующие границы пути.
-	static const int ERROR_PATH_BORDERS_NOT_EXIST = 4;
+	static const int ERROR_WRONG_PATH_BORDERS = 3;
 	// Не удалось открыть файл.
-	static const int ERROR_COULD_NOT_OPEN_FILE = 5;
+	static const int ERROR_COULD_NOT_OPEN_FILE = 4;
 
 	/**
 	 * Конструктор по умолчанию.
@@ -103,6 +99,11 @@ public:
 	 * @param fileName - имя файла, с которого считывать.
 	 */
 	Graph(const char * fileName);
+
+	/**
+	 * Деструктор.
+	 */
+	~Graph();
 
 	/**
 	 * Считывает граф из файла.
@@ -144,20 +145,20 @@ public:
 	 * Текущий переход выделяется красным цветом, пройденные переходы синим цветом, непройденные - черным.
 	 * @param fileNamePrefix - префикс имени dot-файла на выходе, содержащий полный путь.
 	 * @param stepCount - указатель переменную-счетчик сгенерированных файлов.
-	 * @param states - указатель на вектор текущего состояния выполнения.
+	 * @param states - указатель на текущие состояния выполнения.
 	 * @param currentEdge - текущая дуга графа.
 	 * @return - имя сгенерированного файла.
 	 */
-	std::string Graph::generateDotCodeForStep(const char * fileNamePrefix, int * stepCount, const std::vector<ExecutionState *> * states, const Edge currentEdge);
+	std::string Graph::generateDotCodeForStep(const char * fileNamePrefix, int * stepCount, const std::map<int, ExecutionState *> * states, const Edge currentEdge);
 
 	/**
 	 * Генерация файла с описанием графа (для найденного результата) на языке dot.
 	 * Переходы, принадлежащие результирующему пути, выделяются зеленым цветом, остальные - черным.
 	 * @param fileNamePrefix - префикс имени dot-файла на выходе, содержащий полный путь.
 	 * @param stepCount - указатель переменную-счетчик сгенерированных файлов.
-	 * @param states - указатель на вектор текущего состояния выполнения.
+	 * @param states - указатель на текущие состояния выполнения.
 	 * @param result - указатель на результат работы алгоритма.
 	 * @return - имя сгенерированного файла.
 	 */
-	std::string generateDotCodeForResult(const char * fileNamePrefix, int * stepCount, const std::vector<ExecutionState *> * states, ExecutionState * result);
+	std::string generateDotCodeForResult(const char * fileNamePrefix, int * stepCount, const std::map<int, ExecutionState *> * states, ExecutionState * result);
 };
