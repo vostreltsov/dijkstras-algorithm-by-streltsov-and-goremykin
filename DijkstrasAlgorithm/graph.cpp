@@ -152,19 +152,19 @@ char * Graph::getErrorString(const int errorCode)
 	switch (errorCode)
 	{
 	case ERROR_NOT_EXISTS:
-		return "No errors were found";
+		return "Ошибок нет";
 	case ERROR_NEGATIVE_WEIGHT:
-		return "An edge with negative weight was found";
+		return "Найдена дуга с отрицательным весом";
 	case ERROR_LOOP_EXISTS:
-		return "A loop was found";
+		return "Найдена петля";
 	case ERROR_UNKNOWN_NODE:
-		return "A transition to (from) an undefined vertex was found";
+		return "Найдена дуга с между несуществующими вершинами";
 	case ERROR_PATH_BORDERS_NOT_EXIST:
-		return "Start or end node of the path does not exist in the graph";
+		return "Начальная или конечная вершина не существует в графе";
 	case ERROR_COULD_NOT_OPEN_FILE:
-		return "Could not open file";
+		return "Не удалось открыть файл";
 	default:
-		return "Unknown error";
+		return "Неизвестная ошибка";
 	}
 }
 
