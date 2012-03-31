@@ -5,7 +5,7 @@ GUI::GUI(QWidget *parent, Qt::WFlags flags)
 {
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("CP1251"));
 	ui.setupUi(this);
-	validator.setRegExp(QRegExp("\\d+"));
+	validator.setRegExp(QRegExp("[^ ]+"));
 	ui.leStartVertex->setValidator(&validator);
 	ui.leEndVertex->setValidator(&validator);
 	ui.btnNext->setEnabled(false);
@@ -56,28 +56,20 @@ bool GUI::isValid()
 	return QFile::exists(dotExeFileName);
 }
 
-bool GUI::validateFormat(QList<QString> * lines, int * maxVertex)
+bool GUI::validateFormat(QList<QString> * lines)
 {
-	QRegExp regex("\\s*(\\d+)\\s+(\\d+)\\s+(-?\\d+)\\s*");
+	QRegExp regex("\\s*([^ ]+)\\s+([^ ]+)\\s+(-?\\d+)\\s*");
 	QTextDocument * doc = ui.teGraph->document();
 	bool failed = false;
-	if (maxVertex != NULL)
-		*maxVertex = -1;
 
 	for (int i = 0; i < doc->lineCount(); i++)
 	{
 		QString line = doc->findBlockByLineNumber(i).text();
 		if (line != QString(""))
 		{
-			// Строка должна соответствовать шаблону \s*(\d+)\s+(\d+)\s+(-?\d)\s*
+			// Строка должна соответствовать шаблону \s*([^ ]+)\s+([^ ]+)\s+(-?\d)\s*
 			if (regex.exactMatch(line))
 			{
-				int v1 = regex.cap(1).toInt();
-				int v2 = regex.cap(2).toInt();
-				if (maxVertex != NULL && v1 > *maxVertex)
-					*maxVertex = v1;
-				if (maxVertex != NULL && v2 > *maxVertex)
-					*maxVertex = v2;
 				if (lines != NULL)
 					*lines << line;
 			}
@@ -106,7 +98,7 @@ void GUI::btnShowGraph_clicked(bool checked)
 	scene.clear();
 
 	// Если найдены ошибки в формате - выходим.
-	if (!validateFormat(&lines, NULL))
+	if (!validateFormat(&lines))
 	{
 		QMessageBox::warning(NULL, QString("Ошибка"), QString("Список дуг не соответствует формату x y w."));
 		return;
@@ -122,9 +114,9 @@ void GUI::btnShowGraph_clicked(bool checked)
 	fprintf_s(file, "digraph {\nrankdir = LR;\n");
 	for (QList<QString>::const_iterator iter = lines.constBegin(); iter != lines.constEnd(); iter++)
 	{
-		QRegExp regex("\\s*(\\d+)\\s+(\\d+)\\s+(-?\\d+)\\s*");
+		QRegExp regex("\\s*([^ ]+)\\s+([^ ]+)\\s+(-?\\d+)\\s*");
 		regex.exactMatch(*iter);
-		fprintf_s(file, "%d -> %d [label=\"%d\"];\n", regex.cap(1).toInt(), regex.cap(2).toInt(), regex.cap(3).toInt());
+		fprintf_s(file, "\"%s\" -> \"%s\" [label=\"%I64d\"];\n", regex.cap(1).toLocal8Bit().data(), regex.cap(2).toLocal8Bit().data(), regex.cap(3).toLongLong());
 	}
 	fprintf_s(file, "};");
 	fclose(file);
@@ -141,14 +133,13 @@ void GUI::btnShowGraph_clicked(bool checked)
 void GUI::btnSearch_clicked(bool checked)
 {
 	QList<QString> lines;	// Непустые строки из содержимого TextEdit.
-	int maxVertex = -1;		// Максимальный встретившийся номер вершины.
 
 	ui.btnNext->setEnabled(false);
 	ui.btnPrevious->setEnabled(false);
 	scene.clear();
 
 	// Если найдены ошибки в формате - выходим.
-	if (!validateFormat(&lines, &maxVertex))
+	if (!validateFormat(&lines))
 	{
 		QMessageBox::warning(NULL, QString("Ошибка"), QString("Список дуг не соответствует формату x y w."));
 		return;
@@ -171,7 +162,7 @@ void GUI::btnSearch_clicked(bool checked)
 		QMessageBox::warning(NULL, QString("Ошибка"), QString("Не удалось сгенерировать входной файл для работы алгоритма."));
 		return;
 	}
-	fprintf_s(file, "%d\n %d %d\n", (int)lines.size(), ui.leStartVertex->text().toInt(), ui.leEndVertex->text().toInt());
+	fprintf_s(file, "%I64d\n%s %s\n", (__int64)lines.size(), ui.leStartVertex->text().toLocal8Bit().data(), ui.leEndVertex->text().toLocal8Bit().data());
 	for (QList<QString>::const_iterator iter = lines.constBegin(); iter != lines.constEnd(); iter++)
 		fprintf_s(file, "%s\n", iter->toLocal8Bit().data());
 	fclose(file);

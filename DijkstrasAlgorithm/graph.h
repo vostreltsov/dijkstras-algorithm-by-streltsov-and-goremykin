@@ -7,16 +7,30 @@
 struct Node;
 
 /**
+ * Элемент списка из файла.
+ */
+struct FileListItem
+{
+	std::string from;	// Начало дуги.
+	std::string to;		// Конец дуги.
+	__int64 weight;		// Вес дуги.
+
+	FileListItem();
+	FileListItem(const std::string _from, const std::string _to, const __int64 _weight);
+	bool operator==(const FileListItem & other) const;
+};
+
+/**
  * Дуга между двумя узлами.
  */
 struct Edge
 {
 	Node * from;	// Начало дуги.
 	Node * to;		// Конец дуги.
-	int weight;		// Вес дуги.
+	__int64 weight;	// Вес дуги.
 
 	Edge();
-	Edge(Node * _from, Node * _to, const int _weight);
+	Edge(Node * _from, Node * _to, const __int64 _weight);
 	bool operator==(const Edge & other) const;
 };
 
@@ -25,11 +39,12 @@ struct Edge
  */
 struct Node
 {
-	int number;					// Номер узла.
-	std::vector<Edge> edges;	// Дуги, выходящие из этого узла.
+	std::string name;			// Имя узла.
+	std::vector<Edge *> edges;	// Дуги, выходящие из этого узла.
 
 	Node();
-	Node(const int _number);
+	Node(const std::string _name);
+	~Node();
 };
 
 /**
@@ -38,10 +53,10 @@ struct Node
  */
 struct ExecutionState
 {
-	Node * node;			// Состоянию ставится в соответствие узел графа.
-	int totalWeight;		// Длина пути до узла.
-	bool passed;			// Пройден ли узел.
-	std::vector<Edge> path;	// Путь от начальной вершины до this->node.
+	Node * node;				// Соответствующий узел в графе.
+	__int64 totalWeight;		// Длина пути до узла.
+	bool passed;				// Пройден ли узел.
+	std::vector<Edge *> path;	// Путь от начальной вершины до this->node.
 
 	ExecutionState();
 	ExecutionState(const Node * _node);
@@ -53,10 +68,10 @@ struct ExecutionState
 class Graph
 {
 private:
-	std::map<int, Node *> nodes;	// Узлы графа.
-	std::vector<int> errors;		// Найденные "ошибки" в графе.
-	Node * startNode;				// Начальная вершина маршрута.
-	Node * endNode;					// Конечная вершина маршрута.
+	std::map<std::string, Node *> nodes;	// Узлы графа.
+	std::vector<int> errors;				// Найденные "ошибки" в графе.
+	Node * startNode;						// Начальная вершина маршрута.
+	Node * endNode;							// Конечная вершина маршрута.
 
 #ifdef _DEBUG
 	friend class TestSuite;
@@ -64,9 +79,9 @@ private:
 
 	/**
 	 * Строит граф из считанных из файла данных.
-	 * @param edges - вектор объектов Edge. В этих объектах вместо указателей Node * используются индексы узлов.
+	 * @param edges - вектор объектов FileListItem.
 	 */
-	void build(std::vector<Edge> edges);
+	void build(std::vector<FileListItem> edges);
 
 	/**
 	 * Проверяет считанные данные на удовлетворение ограничениям: неотрицательный вес дуг и отсутствие петель.
@@ -75,7 +90,7 @@ private:
 	 * @param start - начальная вершина маршрута.
 	 * @param end - конечная вершина маршрута.
 	 */
-	void validate(std::vector<Edge> edges, const int start, const int end);
+	void validate(std::vector<FileListItem> edges, const std::string start, const std::string end);
 
 public:
 	// Считанный граф удовлетворяет условиям.
@@ -149,7 +164,7 @@ public:
 	 * @param currentEdge - текущая дуга графа.
 	 * @return - имя сгенерированного файла.
 	 */
-	std::string Graph::generateDotCodeForStep(const char * fileNamePrefix, int * stepCount, const std::map<int, ExecutionState *> * states, const Edge currentEdge);
+	std::string Graph::generateDotCodeForStep(const char * fileNamePrefix, int * stepCount, const std::map<std::string, ExecutionState *> * states, const Edge * currentEdge);
 
 	/**
 	 * Генерация файла с описанием графа (для найденного результата) на языке dot.
@@ -160,5 +175,5 @@ public:
 	 * @param result - указатель на результат работы алгоритма.
 	 * @return - имя сгенерированного файла.
 	 */
-	std::string generateDotCodeForResult(const char * fileNamePrefix, int * stepCount, const std::map<int, ExecutionState *> * states, ExecutionState * result);
+	std::string generateDotCodeForResult(const char * fileNamePrefix, int * stepCount, const std::map<std::string, ExecutionState *> * states, ExecutionState * result);
 };

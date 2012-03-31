@@ -34,7 +34,7 @@ private:
 	bool dotPathSetManually;	// ”казан ли путь до dot.exe вручную.
 	QRegExpValidator validator;	// ¬алидатор на вершины.
 
-	bool validateFormat(QList<QString> * lines, int * maxVertex);
+	bool validateFormat(QList<QString> * lines);
 	void cleanUp();
 
 private slots:
