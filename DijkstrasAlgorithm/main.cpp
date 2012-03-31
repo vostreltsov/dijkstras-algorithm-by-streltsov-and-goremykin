@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 			printf("Errors found:\n");
 			std::vector<int> errors = G->getErrors();
 			fprintf_s(file, "fail\n%d\n", (int)errors.size());
-			for (int i = 0; i < errors.size(); i++)
+			for (size_t i = 0; i < errors.size(); i++)
 			{
 				printf("%s\n", Graph::getErrorString(errors[i]));
 				fprintf_s(file, "%s\n", Graph::getErrorString(errors[i]));
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 			std::vector<std::string> * dotFilesGenerated = new std::vector<std::string>;
 			G->run(argv[3], dotFilesGenerated);
 			fprintf_s(file, "success\n%d\n", (int)dotFilesGenerated->size());
-			for (int i = 0; i < dotFilesGenerated->size(); i++)
+			for (size_t i = 0; i < dotFilesGenerated->size(); i++)
 				fprintf_s(file, "%s\n", (*dotFilesGenerated)[i]);
 			delete dotFilesGenerated;
 		}

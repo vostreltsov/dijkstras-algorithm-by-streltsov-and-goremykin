@@ -51,7 +51,7 @@ void Graph::build(const int vertexCount, std::vector<Edge> edges)
 	for (int i = 0; i < vertexCount; i++)
 		nodes.push_back(Node(i));
 	// Строим связи между узлами.
-	for (int i = 0; i < edges.size(); i++)
+	for (size_t i = 0; i < edges.size(); i++)
 	{
 		Node * from = &nodes[(int)edges[i].from];
 		Node * to = &nodes[(int)edges[i].to];
@@ -66,7 +66,7 @@ void Graph::validate(const int vertexCount, std::vector<Edge> edges, const int s
 	bool unknownNode = false;
 	bool unknownBorders = (start < 0 || start >= vertexCount || end < 0 || end >= vertexCount);
 
-	for (int i = 0; i < edges.size(); i++)
+	for (size_t i = 0; i < edges.size(); i++)
 	{
 		// Есть ли дуги с отрицательным весом?
 		if (edges[i].weight < 0)
@@ -175,7 +175,7 @@ ExecutionState Graph::run(const char * fileNamePrefix, std::vector<std::string> 
 	ExecutionState * startState = NULL;		// Начальное состояние при выполнении.
 
 	// Создаем объект ExecutionState для каждого узла графа и запоминаем начальное состояние.
-	for (int i = 0; i < nodes.size(); i++)
+	for (size_t i = 0; i < nodes.size(); i++)
 	{
 		ExecutionState * newState = new ExecutionState(&nodes[i]);
 		if (newState->node == startNode)
@@ -192,13 +192,13 @@ ExecutionState Graph::run(const char * fileNamePrefix, std::vector<std::string> 
 	while (currentState != NULL)
 	{
 		// Просматриваем всех соседей текущей вершины.
-		for (int i = 0; i < currentState->node->edges.size(); i++)
+		for (size_t i = 0; i < currentState->node->edges.size(); i++)
 		{
 			Edge edge = currentState->node->edges[i];
 			ExecutionState * destState = states[edge.to->number];	// Cостояние, соответствующее конечной вершине ребра.
 
 			// Перезаписываем путь до конечной вершины текущей дуги.
-			if (destState->totalWeight == -1 || destState->totalWeight > currentState->totalWeight + edge.weight)
+			if (currentState->totalWeight != -1 && (destState->totalWeight == -1 || destState->totalWeight > currentState->totalWeight + edge.weight))
 			{
 				destState->path = currentState->path;
 				destState->path.push_back(edge);
@@ -212,13 +212,15 @@ ExecutionState Graph::run(const char * fileNamePrefix, std::vector<std::string> 
 		// Помечаем вершину как пройденную и выбираем новую вершину с минимальной меткой.
 		currentState->passed = true;
 		currentState = NULL;
-		for (int i = 0; i < states.size(); i++)
+		for (size_t i = 0; i < states.size(); i++)
 		{
 			ExecutionState * tmp = states[i];
 			if (!tmp->passed)
 			{
 				// Выбираем текущую вершину, если она пока что равна NULL или найдена вершина с меньшей меткой.
-				if (currentState == NULL || (tmp->totalWeight != -1 && currentState->totalWeight > tmp->totalWeight))
+				if (currentState == NULL ||
+					(tmp->totalWeight != -1 && currentState->totalWeight > tmp->totalWeight) ||
+					(currentState->totalWeight == -1 && tmp->totalWeight != -1))
 					currentState = tmp;
 			}
 		}
@@ -228,7 +230,7 @@ ExecutionState Graph::run(const char * fileNamePrefix, std::vector<std::string> 
 
 	// Формируем результат.
 	ExecutionState result;
-	for (int i = 0; i < states.size(); i++)
+	for (size_t i = 0; i < states.size(); i++)
 		if (!states[i]->path.empty() && states[i]->path.front().from == startNode && states[i]->path.back().to == endNode)
 			result = *states[i];
 
@@ -236,7 +238,7 @@ ExecutionState Graph::run(const char * fileNamePrefix, std::vector<std::string> 
 	dotFilesGenerated->push_back(generateDotCodeForResult(fileNamePrefix, &stepCount, &states, &result));
 
 	//  Очищаем выделенную память.
-	for (int i = 0; i < states.size(); i++)
+	for (size_t i = 0; i < states.size(); i++)
 		delete states[i];
 
 	return result;
@@ -254,7 +256,7 @@ std::string Graph::generateDotCodeForStep(const char * fileNamePrefix, int * ste
 	fprintf_s(file, "digraph {\nrankdir = LR;\n");
 	// Задаем узлы.
 	std::vector<std::string> nodestrings;
-	for (int i = 0; i < states->size(); i++)
+	for (size_t i = 0; i < states->size(); i++)
 	{
 		ExecutionState * state = (*states)[i];
 		sprintf_s(tmp, 256, "\"%d\\n len=%d\"", state->node->number, state->totalWeight);
@@ -268,11 +270,11 @@ std::string Graph::generateDotCodeForStep(const char * fileNamePrefix, int * ste
 		fprintf_s(file, "%s\n", wr.c_str());
 	}
 	// Задаем переходы.
-	for (int i = 0; i < states->size(); i++)
+	for (size_t i = 0; i < states->size(); i++)
 	{
 		ExecutionState * state = (*states)[i];
 		std::vector<Edge> edges = state->node->edges;
-		for (int j = 0; j < edges.size(); j++)
+		for (size_t j = 0; j < edges.size(); j++)
 		{
 			std::string wr = nodestrings[edges[j].from->number] + " -> " + nodestrings[edges[j].to->number];
 
@@ -304,7 +306,7 @@ std::string Graph::generateDotCodeForResult(const char * fileNamePrefix, int * s
 	fprintf_s(file, "digraph {\nrankdir = LR;\n");
 	// Задаем узлы.
 	std::vector<std::string> nodestrings;
-	for (int i = 0; i < states->size(); i++)
+	for (size_t i = 0; i < states->size(); i++)
 	{
 		ExecutionState * state = (*states)[i];
 		sprintf_s(tmp, 256, "\"%d\\n len=%d\"", state->node->number, state->totalWeight);
@@ -316,22 +318,22 @@ std::string Graph::generateDotCodeForResult(const char * fileNamePrefix, int * s
 		fprintf_s(file, "%s\n", wr.c_str());
 	}
 	// Задаем переходы.
-	for (int i = 0; i < states->size(); i++)
+	for (size_t i = 0; i < states->size(); i++)
 	{
 		ExecutionState * state = (*states)[i];
 		std::vector<Edge> edges = state->node->edges;
-		for (int j = 0; j < edges.size(); j++)
+		for (size_t j = 0; j < edges.size(); j++)
 		{
 			std::string wr = nodestrings[edges[j].from->number] + " -> " + nodestrings[edges[j].to->number];
 
 			// Принадлежит ли дуга результирующему пути?
 			bool belongsToResult = false;
-			for (int k = 0; !belongsToResult && k < result->path.size(); k++)
+			for (size_t k = 0; !belongsToResult && k < result->path.size(); k++)
 				if (result->path[k] == edges[j])
 					belongsToResult = true;
 
 			if (belongsToResult)
-				sprintf_s(tmp, 256, "[label=\"%d\", color=green];", edges[j].weight);	// Выделяем дугу, принадлежащую пути, зеленым цветом.
+				sprintf_s(tmp, 256, "[label=\"%d\", color=magenta];", edges[j].weight);	// Выделяем дугу, принадлежащую пути, зеленым цветом.
 			else
 				sprintf_s(tmp, 256, "[label=\"%d\"];", edges[j].weight);
 
