@@ -16,7 +16,8 @@
 #include <qiodevice.h>
 #include <qfile.h>
 #include <qtextstream.h>
- #include <qfiledialog.h>
+#include <qfiledialog.h>
+#include <qvalidator.h>
 #include "ui_gui.h"
 
 class GUI : public QMainWindow
@@ -31,6 +32,7 @@ private:
 	int currentImage;			// Индекс текущей картинки.
 	QGraphicsScene scene;		// Для показа картинок.
 	bool dotPathSetManually;	// Указан ли путь до dot.exe вручную.
+	QRegExpValidator validator;	// Валидатор на вершины.
 
 	bool validateFormat(QList<QString> * lines, int * maxVertex);
 	void cleanUp();

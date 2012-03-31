@@ -5,6 +5,11 @@ GUI::GUI(QWidget *parent, Qt::WFlags flags)
 {
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("CP1251"));
 	ui.setupUi(this);
+	validator.setRegExp(QRegExp("\\d+"));
+	ui.leStartVertex->setValidator(&validator);
+	ui.leEndVertex->setValidator(&validator);
+	ui.btnNext->setEnabled(false);
+	ui.btnPrevious->setEnabled(false);
 	connect(ui.btnShowGraph, SIGNAL(clicked(bool)), this, SLOT(btnShowGraph_clicked(bool)));
 	connect(ui.btnSearch, SIGNAL(clicked(bool)), this, SLOT(btnSearch_clicked(bool)));
 	connect(ui.btnPrevious, SIGNAL(clicked(bool)), this, SLOT(btnPrevious_clicked(bool)));
@@ -94,6 +99,10 @@ void GUI::btnShowGraph_clicked(bool checked)
 {
 	QList<QString> lines;	// Непустые строки из содержимого TextEdit.
 
+	ui.btnNext->setEnabled(false);
+	ui.btnPrevious->setEnabled(false);
+	ui.labGraphImage->clear();
+
 	// Если найдены ошибки в формате - выходим.
 	if (!validateFormat(&lines, NULL))
 	{
@@ -102,7 +111,7 @@ void GUI::btnShowGraph_clicked(bool checked)
 	}
 	if (lines.size() == 0)
 		return;
-	
+
 	// Генерируем dot-файл.
 	QString tmpFileName = appPath + QString("tmp.dot");
 	FILE * file;
@@ -123,15 +132,18 @@ void GUI::btnShowGraph_clicked(bool checked)
 	QProcess::execute(dotExeFileName, args);
 	ui.labGraphImage->setPixmap(tmpFileName + QString(".png"));
 	_unlink(tmpFileName.toLocal8Bit().data());
-	_unlink((tmpFileName + QString(".png")).toLocal8Bit().data());	
+	_unlink((tmpFileName + QString(".png")).toLocal8Bit().data());
 	cleanUp();
 }
 
 void GUI::btnSearch_clicked(bool checked)
 {
-	
 	QList<QString> lines;	// Непустые строки из содержимого TextEdit.
-	int maxVertex = -1;		// Максимальный встретившийся номер вершины.	
+	int maxVertex = -1;		// Максимальный встретившийся номер вершины.
+
+	ui.btnNext->setEnabled(false);
+	ui.btnPrevious->setEnabled(false);
+	ui.labGraphImage->clear();
 
 	// Если найдены ошибки в формате - выходим.
 	if (!validateFormat(&lines, &maxVertex))
@@ -141,6 +153,11 @@ void GUI::btnSearch_clicked(bool checked)
 	}
 	if (lines.size() == 0)
 		return;
+	if (ui.leStartVertex->text() == ui.leEndVertex->text())
+	{
+		QMessageBox::warning(NULL, QString("Ошибка"), QString("Начальная и конечная вершины маршрута совпадают."));
+		return;
+	}
 
 	cleanUp();
 
@@ -167,9 +184,10 @@ void GUI::btnSearch_clicked(bool checked)
 	_unlink(inputFileName.toLocal8Bit().data());
 
 	// Подготовка данных для визуализации.
+	statusBar()->showMessage(QString("Выполнение алгоритма..."));
 	if (fopen_s(&file, outputFileName.toLocal8Bit().data(), "r") != 0)
 	{
-		QMessageBox::warning(NULL, QString("Ошибка"), QString("Не удалось открыть файл с результатами работы алгоритма."));
+		statusBar()->showMessage(QString("Не удалось открыть файл с результатами работы алгоритма."));
 		return;
 	}
 	char buf[256] = "";
@@ -188,10 +206,13 @@ void GUI::btnSearch_clicked(bool checked)
 			if (i != linesCount - 1)
 				errors += QString("\n");
 		}
+		statusBar()->showMessage(QString(""));
 		QMessageBox::warning(NULL, QString("Ошибки во входных данных."), errors);
 	}
 	else
 	{
+		int pathSize = 0;
+		fscanf_s(file, "%d\n", &pathSize);
 		// Визуализируем шаги алгоритма.
 		for (int i = 0; i < linesCount; i++)
 		{
@@ -203,8 +224,14 @@ void GUI::btnSearch_clicked(bool checked)
 			_unlink(buf);
 			images.push_back(QString(buf) + QString(".png"));
 		}
+		if (pathSize == 0)
+			statusBar()->showMessage(QString("Путь не найден."));
+		else
+			statusBar()->showMessage(QString("Путь найден"));
 		// Показываем начальный шаг.
 		ui.labGraphImage->setPixmap(QPixmap(images[0]));
+		ui.btnNext->setEnabled(true);
+		ui.btnPrevious->setEnabled(false);
 	}
 	fclose(file);
 	_unlink(outputFileName.toLocal8Bit().data());
@@ -218,7 +245,8 @@ void GUI::btnPrevious_clicked(bool checked)
 	if (currentImage < 0)
 		currentImage = images.size() - 1;
 	ui.labGraphImage->setPixmap(QPixmap(images[currentImage]));
-
+	ui.btnNext->setEnabled(true);
+	ui.btnPrevious->setEnabled(currentImage > 0);
 }
 
 void GUI::btnNext_clicked(bool checked)
@@ -229,6 +257,8 @@ void GUI::btnNext_clicked(bool checked)
 	if (currentImage == images.size())
 		currentImage = 0;
 	ui.labGraphImage->setPixmap(QPixmap(images[currentImage]));
+	ui.btnNext->setEnabled(currentImage < images.size() - 1);
+	ui.btnPrevious->setEnabled(true);
 }
 
 void GUI::btnMenuOpen_triggered(bool checked)

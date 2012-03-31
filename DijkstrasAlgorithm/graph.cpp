@@ -246,7 +246,8 @@ ExecutionState Graph::run(const char * fileNamePrefix, std::vector<std::string> 
 			result = *iter->second;
 
 	// Генерируем файл, в котором отображается оптимальный путь.
-	dotFilesGenerated->push_back(generateDotCodeForResult(fileNamePrefix, &stepCount, &states, &result));
+	if (result.path.size() > 0)
+		dotFilesGenerated->push_back(generateDotCodeForResult(fileNamePrefix, &stepCount, &states, &result));
 
 	//  Очищаем выделенную память.
 	for (size_t i = 0; i < states.size(); i++)

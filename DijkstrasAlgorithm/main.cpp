@@ -47,8 +47,8 @@ int main(int argc, char *argv[])
 		{
 			// Пишем в файл результаты работы алгоритма.
 			std::vector<std::string> * dotFilesGenerated = new std::vector<std::string>;
-			G->run(argv[3], dotFilesGenerated);
-			fprintf_s(file, "success\n%d\n", (int)dotFilesGenerated->size());
+			ExecutionState result = G->run(argv[3], dotFilesGenerated);
+			fprintf_s(file, "success\n%d\n%d\n", (int)dotFilesGenerated->size(), (int)result.path.size());
 			for (size_t i = 0; i < dotFilesGenerated->size(); i++)
 				fprintf_s(file, "%s\n", (*dotFilesGenerated)[i]);
 			delete dotFilesGenerated;
