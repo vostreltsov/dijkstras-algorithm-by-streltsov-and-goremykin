@@ -46,6 +46,7 @@ private slots:
 	void btnMenuSave_triggered(bool checked);
 	void btnMenuExit_triggered(bool checked);
 	void btnMenuHelp_triggered(bool checked);
+	void btnMenuAlgorithm_triggered(bool checked);
 	void btnMenuAbout_triggered(bool checked);
 
 public:

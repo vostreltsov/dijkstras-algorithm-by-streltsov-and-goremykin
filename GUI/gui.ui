@@ -192,8 +192,10 @@
      <string>Справка</string>
     </property>
     <addaction name="btnMenuHelp"/>
+    <addaction name="btnMenuAlgorithm"/>
     <addaction name="separator"/>
     <addaction name="btnMenuAbout"/>
+    <addaction name="separator"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -221,6 +223,11 @@
   <action name="btnMenuAbout">
    <property name="text">
     <string>О программе...</string>
+   </property>
+  </action>
+  <action name="btnMenuAlgorithm">
+   <property name="text">
+    <string>Об алгоритме...</string>
    </property>
   </action>
  </widget>
