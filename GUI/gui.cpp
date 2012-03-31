@@ -18,11 +18,15 @@ GUI::GUI(QWidget *parent, Qt::WFlags flags)
 
 	// Загружаем настройки.
 	appPath = QCoreApplication::applicationDirPath() + "/";
-	QSettings settings(appPath + QString("settings.ini"), QSettings::IniFormat);
-	dotExeFileName = settings.value("Main/dotpath", "C:/Program Files (x86)/Graphviz 2.28/bin/dot.exe").toString();
+	dotExeFileName = "";
 	dotPathSetManually = false;
-	if (dotExeFileName[1] != QChar(':'))
-		dotExeFileName = appPath + dotExeFileName;
+	if (QFile::exists(appPath + QString("settings.ini")))
+	{
+		QSettings settings(appPath + QString("settings.ini"), QSettings::IniFormat);
+		dotExeFileName = settings.value("Main/dotpath", "").toString();
+		if (dotExeFileName.length() > 0 && dotExeFileName[1] != QChar(':'))
+			dotExeFileName = appPath + dotExeFileName;
+	}
 	if (!QFile::exists(dotExeFileName))
 	{
 		QMessageBox::warning(NULL, QString("Предупреждение"), QString("Не найден файл dot.exe библиотеки GraphViz. Укажите его местоположение."));
