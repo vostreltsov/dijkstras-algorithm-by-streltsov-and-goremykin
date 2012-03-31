@@ -10,6 +10,7 @@ GUI::GUI(QWidget *parent, Qt::WFlags flags)
 	ui.leEndVertex->setValidator(&validator);
 	ui.btnNext->setEnabled(false);
 	ui.btnPrevious->setEnabled(false);
+	ui.gvGraph->setScene(&scene);
 	connect(ui.btnShowGraph, SIGNAL(clicked(bool)), this, SLOT(btnShowGraph_clicked(bool)));
 	connect(ui.btnSearch, SIGNAL(clicked(bool)), this, SLOT(btnSearch_clicked(bool)));
 	connect(ui.btnPrevious, SIGNAL(clicked(bool)), this, SLOT(btnPrevious_clicked(bool)));
@@ -102,7 +103,7 @@ void GUI::btnShowGraph_clicked(bool checked)
 
 	ui.btnNext->setEnabled(false);
 	ui.btnPrevious->setEnabled(false);
-	ui.labGraphImage->clear();
+	scene.clear();
 
 	// Если найдены ошибки в формате - выходим.
 	if (!validateFormat(&lines, NULL))
@@ -131,7 +132,7 @@ void GUI::btnShowGraph_clicked(bool checked)
 	QStringList args;
 	args << QString("-Tpng") << QString("-o") + tmpFileName + QString(".png") << tmpFileName;
 	QProcess::execute(dotExeFileName, args);
-	ui.labGraphImage->setPixmap(tmpFileName + QString(".png"));
+	scene.addPixmap(QPixmap(tmpFileName + QString(".png")));
 	_unlink(tmpFileName.toLocal8Bit().data());
 	_unlink((tmpFileName + QString(".png")).toLocal8Bit().data());
 	cleanUp();
@@ -144,7 +145,7 @@ void GUI::btnSearch_clicked(bool checked)
 
 	ui.btnNext->setEnabled(false);
 	ui.btnPrevious->setEnabled(false);
-	ui.labGraphImage->clear();
+	scene.clear();
 
 	// Если найдены ошибки в формате - выходим.
 	if (!validateFormat(&lines, &maxVertex))
@@ -230,7 +231,7 @@ void GUI::btnSearch_clicked(bool checked)
 		else
 			statusBar()->showMessage(QString("Путь найден"));
 		// Показываем начальный шаг.
-		ui.labGraphImage->setPixmap(QPixmap(images[0]));
+		scene.addPixmap(QPixmap(images[0]));
 		ui.btnNext->setEnabled(true);
 		ui.btnPrevious->setEnabled(false);
 	}
@@ -245,7 +246,8 @@ void GUI::btnPrevious_clicked(bool checked)
 	currentImage--;
 	if (currentImage < 0)
 		currentImage = images.size() - 1;
-	ui.labGraphImage->setPixmap(QPixmap(images[currentImage]));
+	scene.clear();
+	scene.addPixmap(QPixmap(images[currentImage]));
 	ui.btnNext->setEnabled(true);
 	ui.btnPrevious->setEnabled(currentImage > 0);
 }
@@ -257,7 +259,8 @@ void GUI::btnNext_clicked(bool checked)
 	currentImage++;
 	if (currentImage == images.size())
 		currentImage = 0;
-	ui.labGraphImage->setPixmap(QPixmap(images[currentImage]));
+	scene.clear();
+	scene.addPixmap(QPixmap(images[currentImage]));
 	ui.btnNext->setEnabled(currentImage < images.size() - 1);
 	ui.btnPrevious->setEnabled(true);
 }
