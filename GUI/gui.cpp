@@ -5,6 +5,7 @@ GUI::GUI(QWidget *parent, Qt::WFlags flags)
 {
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("CP1251"));
 	ui.setupUi(this);
+	connect(ui.btnShowGraph, SIGNAL(clicked(bool)), this, SLOT(btnShowGraph_clicked(bool)));
 	connect(ui.btnSearch, SIGNAL(clicked(bool)), this, SLOT(btnSearch_clicked(bool)));
 	connect(ui.btnPrevious, SIGNAL(clicked(bool)), this, SLOT(btnPrevious_clicked(bool)));
 	connect(ui.btnNext, SIGNAL(clicked(bool)), this, SLOT(btnNext_clicked(bool)));
@@ -15,30 +16,44 @@ GUI::GUI(QWidget *parent, Qt::WFlags flags)
 	connect(ui.btnMenuHelp, SIGNAL(triggered(bool)), this, SLOT(btnMenuHelp_triggered(bool)));
 	connect(ui.btnMenuAbout, SIGNAL(triggered(bool)), this, SLOT(btnMenuAbout_triggered(bool)));
 
+	// Загружаем настройки.
 	appPath = QCoreApplication::applicationDirPath() + "/";
 	QSettings settings(appPath + QString("settings.ini"), QSettings::IniFormat);
 	dotExeFileName = settings.value("Main/dotpath", "C:/Program Files (x86)/Graphviz 2.28/bin/dot.exe").toString();
+	dotPathSetManually = false;
 	if (dotExeFileName[1] != QChar(':'))
 		dotExeFileName = appPath + dotExeFileName;
+	if (!QFile::exists(dotExeFileName))
+	{
+		QMessageBox::warning(NULL, QString("Предупреждение"), QString("Не найден файл dot.exe библиотеки GraphViz. Укажите его местоположение."));
+		dotExeFileName = QFileDialog::getOpenFileName(this, QString("Местоположение файла dot.exe"), QString(""), QString("dot.exe"), 0, 0);
+		dotPathSetManually = true;
+	}
 }
 
 GUI::~GUI()
 {
-	// Удаляем сгенерированные картинки.
-	for (QVector<QString>::const_iterator iter = images.constBegin(); iter != images.constEnd(); iter++)
-		_unlink((*iter).toLocal8Bit().data());
+	cleanUp();
+	// Сохраняем настройки.
+	QSettings settings(appPath + QString("settings.ini"), QSettings::IniFormat);
+	if (dotPathSetManually)
+		settings.setValue(QString("Main/dotpath"), dotExeFileName);
 }
 
-void GUI::btnSearch_clicked(bool checked)
+bool GUI::isValid()
 {
-	// Проверка входных данных на соответствие формату.
-	QRegExp regex("\\s*(\\d+)\\s+(\\d+)\\s+(-?\\d+)\\s*");	// Валидатор для формата дуг.
-	QTextDocument * doc = ui.teGraph->document();			// Содержимое TextEdit.
-	QList<QString> lines;									// Непустые строки из содержимого TextEdit.
-	bool failed = false;									// Найдены ли ошибки.
-	int maxVertex = -1;										// Максимальный встретившийся номер вершины.
+	return QFile::exists(dotExeFileName);
+}
 
-	for (int i = 0; !failed && i < doc->lineCount(); i++)
+bool GUI::validateFormat(QList<QString> * lines, int * maxVertex)
+{
+	QRegExp regex("\\s*(\\d+)\\s+(\\d+)\\s+(-?\\d+)\\s*");
+	QTextDocument * doc = ui.teGraph->document();
+	bool failed = false;
+	if (maxVertex != NULL)
+		*maxVertex = -1;
+
+	for (int i = 0; i < doc->lineCount(); i++)
 	{
 		QString line = doc->findBlockByLineNumber(i).text();
 		if (line != QString(""))
@@ -48,29 +63,82 @@ void GUI::btnSearch_clicked(bool checked)
 			{
 				int v1 = regex.cap(1).toInt();
 				int v2 = regex.cap(2).toInt();
-				if (v1 > maxVertex)
-					maxVertex = v1;
-				if (v2 > maxVertex)
-					maxVertex = v2;
-				lines << line;
+				if (maxVertex != NULL && v1 > *maxVertex)
+					*maxVertex = v1;
+				if (maxVertex != NULL && v2 > *maxVertex)
+					*maxVertex = v2;
+				if (lines != NULL)
+					*lines << line;
 			}
 			else
 				failed = true;
 		}
 	}
+	return !failed;
+}
 
-	// Если найдены ошибки в формате - выходим.
-	if (failed)
-	{
-		QMessageBox::warning(NULL, QString("Ошибка"), QString("Список дуг не соответствует формату x y w."));
-		return;
-	}
-
-	// Удаляем старые картинки.
+void GUI::cleanUp()
+{
+	// Удаляем сгенерированные картинки.
 	for (QVector<QString>::const_iterator iter = images.constBegin(); iter != images.constEnd(); iter++)
 		_unlink((*iter).toLocal8Bit().data());
 	images.clear();
 	currentImage = 0;
+}
+
+void GUI::btnShowGraph_clicked(bool checked)
+{
+	QList<QString> lines;	// Непустые строки из содержимого TextEdit.
+
+	// Если найдены ошибки в формате - выходим.
+	if (!validateFormat(&lines, NULL))
+	{
+		QMessageBox::warning(NULL, QString("Ошибка"), QString("Список дуг не соответствует формату x y w."));
+		return;
+	}
+	if (lines.size() == 0)
+		return;
+	
+	// Генерируем dot-файл.
+	QString tmpFileName = appPath + QString("tmp.dot");
+	FILE * file;
+	if (fopen_s(&file, tmpFileName.toLocal8Bit().data(), "w"))
+		return;
+	fprintf_s(file, "digraph {\nrankdir = LR;\n");
+	for (QList<QString>::const_iterator iter = lines.constBegin(); iter != lines.constEnd(); iter++)
+	{
+		QRegExp regex("\\s*(\\d+)\\s+(\\d+)\\s+(-?\\d+)\\s*");
+		regex.exactMatch(*iter);
+		fprintf_s(file, "%d -> %d [label=\"%d\"];\n", regex.cap(1).toInt(), regex.cap(2).toInt(), regex.cap(3).toInt());
+	}
+	fprintf_s(file, "};");
+	fclose(file);
+
+	QStringList args;
+	args << QString("-Tpng") << QString("-o") + tmpFileName + QString(".png") << tmpFileName;
+	QProcess::execute(dotExeFileName, args);
+	ui.labGraphImage->setPixmap(tmpFileName + QString(".png"));
+	_unlink(tmpFileName.toLocal8Bit().data());
+	_unlink((tmpFileName + QString(".png")).toLocal8Bit().data());	
+	cleanUp();
+}
+
+void GUI::btnSearch_clicked(bool checked)
+{
+	
+	QList<QString> lines;	// Непустые строки из содержимого TextEdit.
+	int maxVertex = -1;		// Максимальный встретившийся номер вершины.	
+
+	// Если найдены ошибки в формате - выходим.
+	if (!validateFormat(&lines, &maxVertex))
+	{
+		QMessageBox::warning(NULL, QString("Ошибка"), QString("Список дуг не соответствует формату x y w."));
+		return;
+	}
+	if (lines.size() == 0)
+		return;
+
+	cleanUp();
 
 	// Генерация входного файла для консольного приложения с алгоритмом.
 	QString inputFileName = appPath + QString("in.txt");

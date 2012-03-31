@@ -23,10 +23,6 @@ class GUI : public QMainWindow
 {
 	Q_OBJECT
 
-public:
-	GUI(QWidget *parent = 0, Qt::WFlags flags = 0);
-	~GUI();
-
 private:
 	Ui::GUIClass ui;
 	QString dotExeFileName;		// Абсолютный путь к dot.exe.
@@ -34,8 +30,13 @@ private:
 	QVector<QString> images;	// Сгенерированные картинки для текущего введенного графа.
 	int currentImage;			// Индекс текущей картинки.
 	QGraphicsScene scene;		// Для показа картинок.
+	bool dotPathSetManually;	// Указан ли путь до dot.exe вручную.
+
+	bool validateFormat(QList<QString> * lines, int * maxVertex);
+	void cleanUp();
 
 private slots:
+	void btnShowGraph_clicked(bool checked);
 	void btnSearch_clicked(bool checked);
 	void btnPrevious_clicked(bool checked);
 	void btnNext_clicked(bool checked);
@@ -44,6 +45,11 @@ private slots:
 	void btnMenuExit_triggered(bool checked);
 	void btnMenuHelp_triggered(bool checked);
 	void btnMenuAbout_triggered(bool checked);
+
+public:
+	GUI(QWidget *parent = 0, Qt::WFlags flags = 0);
+	~GUI();
+	bool isValid();
 
 };
 

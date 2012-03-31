@@ -6,38 +6,44 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>713</width>
-    <height>481</height>
+    <width>903</width>
+    <height>480</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>710</width>
+    <height>480</height>
+   </size>
+  </property>
   <property name="windowTitle">
-   <string>GUI</string>
+   <string>Алгоритм Дейкстры</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_2">
-    <item row="0" column="0">
-     <widget class="QLabel" name="labGraph">
+    <item row="2" column="3">
+     <widget class="QPushButton" name="btnNext">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
       <property name="text">
-       <string>Список дуг графа в формате x y w:</string>
+       <string>Следующий шаг</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="1" colspan="2">
-     <widget class="QLabel" name="labVisualization">
+    <item row="2" column="2">
+     <widget class="QPushButton" name="btnPrevious">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
       <property name="text">
-       <string>Визуализация графа:</string>
+       <string>Предыдущий шаг</string>
       </property>
      </widget>
     </item>
@@ -74,6 +80,9 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="text">
+         <string>0</string>
+        </property>
        </widget>
       </item>
       <item row="2" column="0">
@@ -97,38 +106,60 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="text">
+         <string>0</string>
+        </property>
        </widget>
       </item>
       <item row="3" column="0" colspan="2">
-       <widget class="QPushButton" name="btnSearch">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+       <widget class="QPushButton" name="btnShowGraph">
         <property name="text">
-         <string>Найти кратчайший путь</string>
+         <string>Показать граф</string>
         </property>
        </widget>
       </item>
      </layout>
     </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="labGraph">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Список дуг графа в формате x y w:</string>
+      </property>
+     </widget>
+    </item>
     <item row="2" column="1">
-     <widget class="QPushButton" name="btnPrevious">
+     <widget class="QPushButton" name="btnSearch">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="text">
-       <string>Предыдущий шаг</string>
+       <string>Найти кратчайший путь</string>
       </property>
      </widget>
     </item>
-    <item row="2" column="2">
-     <widget class="QPushButton" name="btnNext">
+    <item row="0" column="1">
+     <widget class="QLabel" name="labVisualization">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="text">
-       <string>Следующий шаг</string>
+       <string>Визуализация работы алгоритма:</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="1" colspan="2">
+    <item row="1" column="1" colspan="3">
      <widget class="QLabel" name="labGraphImage">
       <property name="text">
        <string/>
@@ -143,7 +174,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>713</width>
+     <width>903</width>
      <height>21</height>
     </rect>
    </property>
