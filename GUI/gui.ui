@@ -144,7 +144,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>0</string>
+          <string>t</string>
          </property>
         </widget>
        </item>
@@ -177,7 +177,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>0</string>
+          <string>s</string>
          </property>
         </widget>
        </item>
