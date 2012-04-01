@@ -1,5 +1,24 @@
 #include "gui.h"
 
+ScalableGraphicsView::ScalableGraphicsView(QWidget * parent)
+{
+}
+
+ScalableGraphicsView::~ScalableGraphicsView()
+{
+}		
+
+void ScalableGraphicsView::wheelEvent(QWheelEvent * event)
+{
+	if (event->modifiers() == Qt::ControlModifier)
+		if (event->delta() > 0)
+			scale(1.25, 1.25);
+		else
+			scale(0.8, 0.8);
+	else
+		QGraphicsView::wheelEvent(event);
+}
+
 GUI::GUI(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
@@ -8,13 +27,31 @@ GUI::GUI(QWidget *parent, Qt::WFlags flags)
 	validator.setRegExp(QRegExp("[^ ]+"));
 	ui.leStartVertex->setValidator(&validator);
 	ui.leEndVertex->setValidator(&validator);
-	ui.btnNext->setEnabled(false);
-	ui.btnPrevious->setEnabled(false);
-	ui.gvGraph->setScene(&scene);
+	enableButtons(false, false, false, false);
+
+	scene = NULL;
+	gvGraph = new ScalableGraphicsView(parent);
+	gvGraph->setScene(NULL);
+	gvGraph->setGeometry(10, 23, 662, 415);
+	gvGraph->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+	gvGraph->setAcceptDrops(false);
+	gvGraph->setAutoFillBackground(true);
+	
+	gvLayout = new QGridLayout(parent);
+	gvLayout->addWidget(gvGraph, 0, 0, 1, 5);
+	gvLayout->addWidget(ui.btnSearch, 1, 0);
+	gvLayout->addWidget(ui.btnToTheBeginning, 1, 1);
+	gvLayout->addWidget(ui.btnPrevious, 1, 2);
+	gvLayout->addWidget(ui.btnNext, 1, 3);
+	gvLayout->addWidget(ui.btnToTheEnd, 1, 4);
+	ui.gbVisualization->setLayout(gvLayout);
+	
 	connect(ui.btnShowGraph, SIGNAL(clicked(bool)), this, SLOT(btnShowGraph_clicked(bool)));
-	connect(ui.btnSearch, SIGNAL(clicked(bool)), this, SLOT(btnSearch_clicked(bool)));
+	connect(ui.btnSearch, SIGNAL(clicked(bool)), this, SLOT(btnSearch_clicked(bool)));	
+	connect(ui.btnToTheBeginning, SIGNAL(clicked(bool)), this, SLOT(btnToTheBeginning_clicked(bool)));
 	connect(ui.btnPrevious, SIGNAL(clicked(bool)), this, SLOT(btnPrevious_clicked(bool)));
 	connect(ui.btnNext, SIGNAL(clicked(bool)), this, SLOT(btnNext_clicked(bool)));
+	connect(ui.btnToTheEnd, SIGNAL(clicked(bool)), this, SLOT(btnToTheEnd_clicked(bool)));
 
 	connect(ui.btnMenuOpen, SIGNAL(triggered(bool)), this, SLOT(btnMenuOpen_triggered(bool)));
 	connect(ui.btnMenuSave, SIGNAL(triggered(bool)), this, SLOT(btnMenuSave_triggered(bool)));
@@ -45,6 +82,11 @@ GUI::GUI(QWidget *parent, Qt::WFlags flags)
 GUI::~GUI()
 {
 	cleanUp();
+	if (scene != NULL)
+		delete scene;
+	layout()->removeWidget(gvGraph);
+	delete gvGraph;
+	delete gvLayout;
 	// Сохраняем настройки.
 	QSettings settings(appPath + QString("settings.ini"), QSettings::IniFormat);
 	if (dotPathSetManually)
@@ -89,13 +131,23 @@ void GUI::cleanUp()
 	currentImage = 0;
 }
 
+void GUI::enableButtons(bool beginning, bool previous, bool next, bool end)
+{
+	ui.btnToTheBeginning->setEnabled(beginning);
+	ui.btnPrevious->setEnabled(previous);
+	ui.btnNext->setEnabled(next);	
+	ui.btnToTheEnd->setEnabled(end);
+}
+
 void GUI::btnShowGraph_clicked(bool checked)
 {
 	QList<QString> lines;	// Непустые строки из содержимого TextEdit.
 
-	ui.btnNext->setEnabled(false);
-	ui.btnPrevious->setEnabled(false);
-	scene.clear();
+	enableButtons(false, false, false, false);
+	if (scene != NULL)
+		delete scene;
+	scene = new QGraphicsScene(parent());
+	gvGraph->setScene(scene);
 
 	// Если найдены ошибки в формате - выходим.
 	if (!validateFormat(&lines))
@@ -124,7 +176,7 @@ void GUI::btnShowGraph_clicked(bool checked)
 	QStringList args;
 	args << QString("-Tpng") << QString("-o") + tmpFileName + QString(".png") << tmpFileName;
 	QProcess::execute(dotExeFileName, args);
-	scene.addPixmap(QPixmap(tmpFileName + QString(".png")));
+	scene->addPixmap(QPixmap(tmpFileName + QString(".png")));
 	_unlink(tmpFileName.toLocal8Bit().data());
 	_unlink((tmpFileName + QString(".png")).toLocal8Bit().data());
 	cleanUp();
@@ -134,9 +186,11 @@ void GUI::btnSearch_clicked(bool checked)
 {
 	QList<QString> lines;	// Непустые строки из содержимого TextEdit.
 
-	ui.btnNext->setEnabled(false);
-	ui.btnPrevious->setEnabled(false);
-	scene.clear();
+	enableButtons(false, false, false, false);
+	if (scene != NULL)
+		delete scene;
+	scene = new QGraphicsScene(parent());
+	gvGraph->setScene(scene);
 
 	// Если найдены ошибки в формате - выходим.
 	if (!validateFormat(&lines))
@@ -209,6 +263,7 @@ void GUI::btnSearch_clicked(bool checked)
 		// Визуализируем шаги алгоритма.
 		for (int i = 0; i < linesCount; i++)
 		{
+			statusBar()->showMessage(QString("Подготовка шага алгоритма: ") + QString::number(i + 1) + QString(" из ") + QString::number(linesCount));
 			fgets(buf, 256, file);
 			buf[strlen(buf) - 1] = '\0';
 			QStringList args;
@@ -222,12 +277,24 @@ void GUI::btnSearch_clicked(bool checked)
 		else
 			statusBar()->showMessage(QString("Путь найден"));
 		// Показываем начальный шаг.
-		scene.addPixmap(QPixmap(images[0]));
-		ui.btnNext->setEnabled(true);
-		ui.btnPrevious->setEnabled(false);
+		scene->addPixmap(QPixmap(images[0]));
+		btnToTheBeginning_clicked(false);
 	}
 	fclose(file);
 	_unlink(outputFileName.toLocal8Bit().data());
+}
+
+void GUI::btnToTheBeginning_clicked(bool checked)
+{
+	if (images.empty())
+		return;
+	currentImage = 0;
+	if (scene != NULL)
+		delete scene;
+	scene = new QGraphicsScene(parent());
+	gvGraph->setScene(scene);
+	scene->addPixmap(QPixmap(images[currentImage]));
+	enableButtons(true, false, true, true);
 }
 
 void GUI::btnPrevious_clicked(bool checked)
@@ -235,12 +302,12 @@ void GUI::btnPrevious_clicked(bool checked)
 	if (images.empty())
 		return;
 	currentImage--;
-	if (currentImage < 0)
-		currentImage = images.size() - 1;
-	scene.clear();
-	scene.addPixmap(QPixmap(images[currentImage]));
-	ui.btnNext->setEnabled(true);
-	ui.btnPrevious->setEnabled(currentImage > 0);
+	if (scene != NULL)
+		delete scene;
+	scene = new QGraphicsScene(parent());
+	gvGraph->setScene(scene);
+	scene->addPixmap(QPixmap(images[currentImage]));
+	enableButtons(true, currentImage > 0, true, true);
 }
 
 void GUI::btnNext_clicked(bool checked)
@@ -248,12 +315,25 @@ void GUI::btnNext_clicked(bool checked)
 	if (images.empty())
 		return;
 	currentImage++;
-	if (currentImage == images.size())
-		currentImage = 0;
-	scene.clear();
-	scene.addPixmap(QPixmap(images[currentImage]));
-	ui.btnNext->setEnabled(currentImage < images.size() - 1);
-	ui.btnPrevious->setEnabled(true);
+	if (scene != NULL)
+		delete scene;
+	scene = new QGraphicsScene(parent());
+	gvGraph->setScene(scene);
+	scene->addPixmap(QPixmap(images[currentImage]));
+	enableButtons(true, true, currentImage < images.size() - 1, true);
+}
+
+void GUI::btnToTheEnd_clicked(bool checked)
+{
+	if (images.empty())
+		return;
+	currentImage = images.size() - 1;
+	if (scene != NULL)
+		delete scene;
+	scene = new QGraphicsScene(parent());
+	gvGraph->setScene(scene);
+	scene->addPixmap(QPixmap(images[currentImage]));
+	enableButtons(true, true, false, true);
 }
 
 void GUI::btnMenuOpen_triggered(bool checked)
@@ -310,13 +390,14 @@ void GUI::btnMenuExit_triggered(bool checked)
 void GUI::btnMenuHelp_triggered(bool checked)
 {
 	QMessageBox::information(NULL, QString("Использование программы"),	QString("Граф представляется списком дуг, элемент списка имеет формат <вершина> <вершина> <вес>\n") +
-																		QString("Например, список дуг может иметь вид:\n0 1 3\n1 2 2\n\n") +
+																		QString("Например, список дуг может иметь вид:\na0 a1 3\na1 a2 2\n\n") +
 																		QString("По нажатию на кнопку \"Показать граф\" появится графическое представление графа в области правее списка дуг.\n") +
 																		QString("По нажатию на кнопку \"Найти кратчайший путь\" будет выполнен алгоритм Дейкстры, шаги которого можно просмотреть в графическом виде.\n") +
 																		QString("Кнопки \"Предыдущий шаг\" и \"Следующий шаг\" позволяют прокручивать шаги алгоритма.\n\n") +
-																		QString("Вершины графа пронумерованы, при каждой вершине хранится метка len, равная длине пути от начальной вершины до нее. Метка len=-1 означает бесконечную длину пути. ") +
+																		QString("Вершины графа имеют имена, при каждой вершине хранится метка len, равная длине пути от начальной вершины до нее. Метка len=-1 означает бесконечную длину пути. ") +
 																		QString("Текущая просматриваемая дуга выделяется красным цветом, просмотренные вершины выделяются пунктиром, а выходящие из них дуги - синим цветом. ") +
-																		QString("На последнем шаге дуги, принадлежащие найденному пути, выделяются фиолетовым цветом.\n"));
+																		QString("На последнем шаге дуги, принадлежащие найденному пути, выделяются фиолетовым цветом.\n") +
+																		QString("Граф можно масштабировать с помощью колеса мыши при зажатой клавише Ctrl."));
 }
 
 void GUI::btnMenuAlgorithm_triggered(bool checked)
