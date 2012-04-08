@@ -239,6 +239,8 @@
     <addaction name="btnMenuOpen"/>
     <addaction name="btnMenuSave"/>
     <addaction name="separator"/>
+    <addaction name="btnMenuCreateReport"/>
+    <addaction name="separator"/>
     <addaction name="btnMenuExit"/>
    </widget>
    <widget class="QMenu" name="menu_2">
@@ -282,6 +284,11 @@
   <action name="btnMenuAlgorithm">
    <property name="text">
     <string>Об алгоритме...</string>
+   </property>
+  </action>
+  <action name="btnMenuCreateReport">
+   <property name="text">
+    <string>Создать отчет в формате html...</string>
    </property>
   </action>
  </widget>

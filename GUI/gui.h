@@ -1,6 +1,7 @@
 #ifndef GUI_H
 #define GUI_H
 
+#include <time.h>
 #include <QtGui/QMainWindow>
 #include <qstring.h>
 #include <qtextcodec.h>
@@ -49,10 +50,12 @@ private:
 	QGridLayout * gvLayout;			// Компоновщик для gvGraph.
 	bool dotPathSetManually;		// Указан ли путь до dot.exe вручную.
 	QRegExpValidator validator;		// Валидатор на вершины.
+	QString lastRoute[2];			// Начало и конец найденного маршрута.
 
 	bool validateFormat(QList<QString> * lines);
 	void cleanUp();
 	void enableButtons(bool beginning, bool previous, bool next, bool end);
+	bool removeDir(const QString & dirName);
 
 private slots:
 	void btnShowGraph_clicked(bool checked);
@@ -63,6 +66,7 @@ private slots:
 	void btnToTheEnd_clicked(bool checked);
 	void btnMenuOpen_triggered(bool checked);
 	void btnMenuSave_triggered(bool checked);
+	void btnMenuCreateReport_triggered(bool checked);
 	void btnMenuExit_triggered(bool checked);
 	void btnMenuHelp_triggered(bool checked);
 	void btnMenuAlgorithm_triggered(bool checked);

@@ -56,13 +56,15 @@ GUI::GUI(QWidget *parent, Qt::WFlags flags)
 
 	connect(ui.btnMenuOpen, SIGNAL(triggered(bool)), this, SLOT(btnMenuOpen_triggered(bool)));
 	connect(ui.btnMenuSave, SIGNAL(triggered(bool)), this, SLOT(btnMenuSave_triggered(bool)));
+	connect(ui.btnMenuCreateReport, SIGNAL(triggered(bool)), this, SLOT(btnMenuCreateReport_triggered(bool)));
+	
 	connect(ui.btnMenuExit, SIGNAL(triggered(bool)), this, SLOT(btnMenuExit_triggered(bool)));
 	connect(ui.btnMenuHelp, SIGNAL(triggered(bool)), this, SLOT(btnMenuHelp_triggered(bool)));
 	connect(ui.btnMenuAlgorithm, SIGNAL(triggered(bool)), this, SLOT(btnMenuAlgorithm_triggered(bool)));
 	connect(ui.btnMenuAbout, SIGNAL(triggered(bool)), this, SLOT(btnMenuAbout_triggered(bool)));
 
 	// Загружаем настройки.
-	appPath = QCoreApplication::applicationDirPath() + "/";
+	appPath = QCoreApplication::applicationDirPath() + QDir::separator();
 	dotExeFileName = "";
 	dotPathSetManually = false;
 	if (QFile::exists(appPath + QString("settings.ini")))
@@ -78,6 +80,7 @@ GUI::GUI(QWidget *parent, Qt::WFlags flags)
 		dotExeFileName = QFileDialog::getOpenFileName(this, QString("Местоположение файла dot.exe"), QString(""), QString("dot.exe"), 0, 0);
 		dotPathSetManually = true;
 	}
+	qsrand((unsigned int)time(NULL));
 }
 
 GUI::~GUI()
@@ -138,6 +141,26 @@ void GUI::enableButtons(bool beginning, bool previous, bool next, bool end)
 	ui.btnPrevious->setEnabled(previous);
 	ui.btnNext->setEnabled(next);	
 	ui.btnToTheEnd->setEnabled(end);
+}
+
+bool GUI::removeDir(const QString & dirName)
+{
+	QDir dir(dirName);
+	if (!dir.exists())
+		return true;
+
+	bool result = true;
+	Q_FOREACH(QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden | QDir::AllDirs | QDir::Files, QDir::DirsFirst))
+	{
+		if (info.isDir())
+			result = removeDir(info.absoluteFilePath());
+		else
+			result = QFile::remove(info.absoluteFilePath());
+		if (!result)
+			return false;
+	}
+	result = dir.rmdir(dirName);
+	return result;
 }
 
 void GUI::btnShowGraph_clicked(bool checked)
@@ -208,6 +231,8 @@ void GUI::btnSearch_clicked(bool checked)
 	}
 
 	cleanUp();
+	lastRoute[0] = ui.leStartVertex->text();
+	lastRoute[1] = ui.leEndVertex->text();
 
 	// Генерация входного файла для консольного приложения с алгоритмом.
 	QString inputFileName = appPath + QString("in.txt");
@@ -217,7 +242,7 @@ void GUI::btnSearch_clicked(bool checked)
 		QMessageBox::warning(NULL, QString("Ошибка"), QString("Не удалось сгенерировать входной файл для работы алгоритма."));
 		return;
 	}
-	fprintf_s(file, "%I64d\n%s %s\n", (__int64)lines.size(), ui.leStartVertex->text().toLocal8Bit().data(), ui.leEndVertex->text().toLocal8Bit().data());
+	fprintf_s(file, "%I64d\n%s %s\n", (__int64)lines.size(), lastRoute[0].toLocal8Bit().data(), lastRoute[1].toLocal8Bit().data());
 	for (QList<QString>::const_iterator iter = lines.constBegin(); iter != lines.constEnd(); iter++)
 		fprintf_s(file, "%s\n", iter->toLocal8Bit().data());
 	fclose(file);
@@ -383,6 +408,66 @@ void GUI::btnMenuSave_triggered(bool checked)
 	file.close();
 }
 
+void GUI::btnMenuCreateReport_triggered(bool checked)
+{
+	if (images.size() < 2)
+	{
+		QMessageBox::information(NULL, QString("Нет данных для отчета"), QString("Для создания отчета необходимо сначала найти кратчайший путь."));
+		return;
+	}
+	QString fileName = QFileDialog::getSaveFileName(this, QString("Сохранить отчет"), QString(""), QString("Файл html (*.html)"), 0, 0);
+	if (fileName == QString(""))
+		return;
+	QFile file(fileName);
+	if (!file.open(QIODevice::WriteOnly))
+	{
+		QMessageBox::warning(NULL, QString("Ошибка"), QString("Не удалось сохранить файл."));
+		return;
+	}
+	QTextStream stream(&file);
+	// Копируем сгенерированные картинки, случайным образом генерируя имена файлов.
+	QVector<QString> pngFileNames;
+	QFileInfo info(fileName);
+	QString basename = info.baseName();
+	QString dir = info.absoluteDir().absolutePath() + QDir::separator();
+	QString suffix = basename + QString(".files") + QDir::separator();
+	QDir tmp(dir);
+	dir += suffix;
+	removeDir(dir);
+	tmp.mkdir(suffix);
+	
+	
+	for (QVector<QString>::const_iterator iter = images.constBegin(); iter != images.constEnd(); iter++)
+	{
+		QString fileName("");
+		do
+		{
+			for (int i = 0; i < 32; i++)
+				if (qrand() % 2)
+					fileName += QChar('a' + qrand() % 26);
+				else
+					fileName += QChar('0' + qrand() % 10);
+		}
+		while (QFile::exists(dir + fileName + QString(".png")));
+		fileName = dir + fileName + QString(".png");
+		QFile::copy(*iter, fileName);
+		pngFileNames.push_back(fileName);
+	}
+
+	stream << QString("<html>\n	<body>\n");
+	stream << QString("		Поиск кратчайшего марштура из вершины <b>") + lastRoute[0] + QString("</b> в вершину <b>") + lastRoute[1] + QString("</b>:<br/>\n");
+	stream << QString("		<img src=\"") + pngFileNames.first() + QString("\"><br/>\n");
+	for (int i = 1; i < pngFileNames.size() - 1; i++)
+	{
+		stream << QString("		Шаг ") + QString::number(i) + QString(":<br/>\n");
+		stream << QString("		<img src=\"") + pngFileNames[i] + QString("\"><br/>\n");
+	}
+	stream << QString("		Результат:<br/>\n");
+	stream << QString("		<img src=\"") + pngFileNames.last() + QString("\"><br/>\n");
+	stream << QString("	</body>\n</html>");
+	file.close();
+}
+
 void GUI::btnMenuExit_triggered(bool checked)
 {
 	close();
@@ -398,7 +483,8 @@ void GUI::btnMenuHelp_triggered(bool checked)
 																		QString("Вершины графа имеют имена, при каждой вершине хранится метка len, равная длине пути от начальной вершины до нее. Метка len=-1 означает бесконечную длину пути. ") +
 																		QString("Текущая просматриваемая дуга выделяется красным цветом, просмотренные вершины выделяются пунктиром, а выходящие из них дуги - синим цветом. ") +
 																		QString("На последнем шаге дуги, принадлежащие найденному пути, выделяются фиолетовым цветом.\n") +
-																		QString("Граф можно масштабировать с помощью колеса мыши при зажатой клавише Ctrl."));
+																		QString("Граф можно масштабировать с помощью колеса мыши при зажатой клавише Ctrl.\n") +
+																		QString("Возможно формирование отчета в формате html. Для этого необходимо в главном меню выбрать пункт Файл->Создать отчет в формате html.\n"));
 }
 
 void GUI::btnMenuAlgorithm_triggered(bool checked)
