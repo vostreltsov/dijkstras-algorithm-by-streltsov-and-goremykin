@@ -68,7 +68,7 @@ Graph::Graph()
 
 Graph::Graph(const char * fileName)
 {
-	readFromFile(fileName);	// Валидация происходит внутри этой функции.
+	readFromFile(fileName);	// Р’Р°Р»РёРґР°С†РёСЏ РїСЂРѕРёСЃС…РѕРґРёС‚ РІРЅСѓС‚СЂРё СЌС‚РѕР№ С„СѓРЅРєС†РёРё.
 }
 
 Graph::~Graph()
@@ -83,16 +83,16 @@ void Graph::build(std::vector<FileListItem> edges)
 		delete iter->second;
 	nodes.clear();
 
-	// Строим связи между узлами.
+	// РЎС‚СЂРѕРёРј СЃРІСЏР·Рё РјРµР¶РґСѓ СѓР·Р»Р°РјРё.
 	for (size_t i = 0; i < edges.size(); i++)
 	{
-		// Добавляем узлы, если их еще нет в графе.
+		// Р”РѕР±Р°РІР»СЏРµРј СѓР·Р»С‹, РµСЃР»Рё РёС… РµС‰Рµ РЅРµС‚ РІ РіСЂР°С„Рµ.
 		if (nodes.find(edges[i].from) == nodes.end())
 			nodes.insert(std::pair<std::string, Node *>(edges[i].from, new Node(edges[i].from)));
 		if (nodes.find(edges[i].to) == nodes.end())
 			nodes.insert(std::pair<std::string, Node *>(edges[i].to, new Node(edges[i].to)));
 
-		// Добавляем дугу между узлами.
+		// Р”РѕР±Р°РІР»СЏРµРј РґСѓРіСѓ РјРµР¶РґСѓ СѓР·Р»Р°РјРё.
 		Node * fromPtr = nodes.find(edges[i].from)->second;
 		Node * toPtr = nodes.find(edges[i].to)->second;
 		fromPtr->edges.push_back(new Edge(fromPtr, toPtr, edges[i].weight));
@@ -108,10 +108,10 @@ void Graph::validate(std::vector<FileListItem> edges, const std::string start, c
 
 	for (size_t i = 0; i < edges.size(); i++)
 	{
-		// Есть ли дуги с отрицательным весом?
+		// Р•СЃС‚СЊ Р»Рё РґСѓРіРё СЃ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рј РІРµСЃРѕРј?
 		if (edges[i].weight < 0)
 			negativeWeight = true;
-		// Есть ли петли?
+		// Р•СЃС‚СЊ Р»Рё РїРµС‚Р»Рё?
 		if (edges[i].from == edges[i].to)
 			loopExists = true;
 		if (edges[i].from == start || edges[i].to == start)
@@ -120,7 +120,7 @@ void Graph::validate(std::vector<FileListItem> edges, const std::string start, c
 			endExists = true;
 	}
 
-	// Заполняем вектор ошибок.
+	// Р—Р°РїРѕР»РЅСЏРµРј РІРµРєС‚РѕСЂ РѕС€РёР±РѕРє.
 	errors.clear();
 	if (negativeWeight)
 		errors.push_back(Graph::ERROR_NEGATIVE_WEIGHT);
@@ -132,11 +132,11 @@ void Graph::validate(std::vector<FileListItem> edges, const std::string start, c
 
 bool Graph::readFromFile(const char * fileName)
 {
-	__int64 m = 0;				// Число дуг в графе.
-	char buf1[256] = "";		// Буфер для чтения строк.
-	char buf2[256] = "";		// Буфер для чтения строк.
-	std::string pathStart = "";	// Начальная вершина маршрута.
-	std::string pathEnd = "";	// Конечная вершина маршрута.
+	__int64 m = 0;				// Р§РёСЃР»Рѕ РґСѓРі РІ РіСЂР°С„Рµ.
+	char buf1[256] = "";		// Р‘СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ СЃС‚СЂРѕРє.
+	char buf2[256] = "";		// Р‘СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ СЃС‚СЂРѕРє.
+	std::string pathStart = "";	// РќР°С‡Р°Р»СЊРЅР°СЏ РІРµСЂС€РёРЅР° РјР°СЂС€СЂСѓС‚Р°.
+	std::string pathEnd = "";	// РљРѕРЅРµС‡РЅР°СЏ РІРµСЂС€РёРЅР° РјР°СЂС€СЂСѓС‚Р°.
 
 	FILE * file;
 	if (fopen_s(&file, fileName, "r"))
@@ -146,14 +146,14 @@ bool Graph::readFromFile(const char * fileName)
 		return false;
 	}
 
-	// Читаем количество дуг, имена начального и конечного узлов маршрута.
+	// Р§РёС‚Р°РµРј РєРѕР»РёС‡РµСЃС‚РІРѕ РґСѓРі, РёРјРµРЅР° РЅР°С‡Р°Р»СЊРЅРѕРіРѕ Рё РєРѕРЅРµС‡РЅРѕРіРѕ СѓР·Р»РѕРІ РјР°СЂС€СЂСѓС‚Р°.
 	fscanf_s(file, "%I64d", &m);
 	fscanf_s(file, "%s", buf1);
 	fscanf_s(file, "%s", buf2);
 	pathStart = buf1;
 	pathEnd = buf2;
 
-	// Оставшаяся часть файла - информация о дугах.
+	// РћСЃС‚Р°РІС€Р°СЏСЃСЏ С‡Р°СЃС‚СЊ С„Р°Р№Р»Р° - РёРЅС„РѕСЂРјР°С†РёСЏ Рѕ РґСѓРіР°С….
 	std::vector<FileListItem> edges;
 	for (__int64 i = 0; i < m; i++)
 	{
@@ -165,7 +165,7 @@ bool Graph::readFromFile(const char * fileName)
 	}
 	fclose(file);
 
-	// Проверяем считанные данные и строим граф, если все нормально.
+	// РџСЂРѕРІРµСЂСЏРµРј СЃС‡РёС‚Р°РЅРЅС‹Рµ РґР°РЅРЅС‹Рµ Рё СЃС‚СЂРѕРёРј РіСЂР°С„, РµСЃР»Рё РІСЃРµ РЅРѕСЂРјР°Р»СЊРЅРѕ.
 	validate(edges, pathStart, pathEnd);
 	if (errors.empty())
 	{
@@ -196,27 +196,27 @@ char * Graph::getErrorString(const int errorCode)
 	switch (errorCode)
 	{
 	case ERROR_NOT_EXISTS:
-		return "Ошибок нет";
+		return "РћС€РёР±РѕРє РЅРµС‚";
 	case ERROR_NEGATIVE_WEIGHT:
-		return "Найдена дуга с отрицательным весом";
+		return "РќР°Р№РґРµРЅР° РґСѓРіР° СЃ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рј РІРµСЃРѕРј";
 	case ERROR_LOOP_EXISTS:
-		return "Найдена петля";
+		return "РќР°Р№РґРµРЅР° РїРµС‚Р»СЏ";
 	case ERROR_WRONG_PATH_BORDERS:
-		return "Начальная или конечная вершина не существует в графе";
+		return "РќР°С‡Р°Р»СЊРЅР°СЏ РёР»Рё РєРѕРЅРµС‡РЅР°СЏ РІРµСЂС€РёРЅР° РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ РІ РіСЂР°С„Рµ";
 	case ERROR_COULD_NOT_OPEN_FILE:
-		return "Не удалось открыть файл";
+		return "РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р»";
 	default:
-		return "Неизвестная ошибка";
+		return "РќРµРёР·РІРµСЃС‚РЅР°СЏ РѕС€РёР±РєР°";
 	}
 }
 
 ExecutionState Graph::run(const char * fileNamePrefix, std::vector<std::string> * dotFilesGenerated)
 {
-	int stepCount = 0;								// Счетчик сгенерированных картинок.
-	std::map<std::string, ExecutionState *> states;	// Каждому узлу в графе ставится в соответствие объект ExecutionState.
-	ExecutionState * startState = NULL;				// Начальное состояние при выполнении.
+	int stepCount = 0;								// РЎС‡РµС‚С‡РёРє СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅС‹С… РєР°СЂС‚РёРЅРѕРє.
+	std::map<std::string, ExecutionState *> states;	// РљР°Р¶РґРѕРјСѓ СѓР·Р»Сѓ РІ РіСЂР°С„Рµ СЃС‚Р°РІРёС‚СЃСЏ РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РѕР±СЉРµРєС‚ ExecutionState.
+	ExecutionState * startState = NULL;				// РќР°С‡Р°Р»СЊРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ РїСЂРё РІС‹РїРѕР»РЅРµРЅРёРё.
 
-	// Создаем объект ExecutionState для каждого узла графа и запоминаем начальное состояние.
+	// РЎРѕР·РґР°РµРј РѕР±СЉРµРєС‚ ExecutionState РґР»СЏ РєР°Р¶РґРѕРіРѕ СѓР·Р»Р° РіСЂР°С„Р° Рё Р·Р°РїРѕРјРёРЅР°РµРј РЅР°С‡Р°Р»СЊРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ.
 	for (std::map<std::string, Node *>::const_iterator iter = nodes.cbegin(); iter != nodes.cend(); iter++)
 	{
 		ExecutionState * newState = new ExecutionState(iter->second);
@@ -226,20 +226,20 @@ ExecutionState Graph::run(const char * fileNamePrefix, std::vector<std::string> 
 	}
 	startState->totalWeight = 0;
 
-	// Генерируем файл в начале выполнения алгоритма.
+	// Р“РµРЅРµСЂРёСЂСѓРµРј С„Р°Р№Р» РІ РЅР°С‡Р°Р»Рµ РІС‹РїРѕР»РЅРµРЅРёСЏ Р°Р»РіРѕСЂРёС‚РјР°.
 	dotFilesGenerated->push_back(generateDotCodeForStep(fileNamePrefix, &stepCount, &states, NULL));
 
-	// Выполняем алгоритм.
-	ExecutionState * currentState = startState;	// Вершина с минимальной меткой.
+	// Р’С‹РїРѕР»РЅСЏРµРј Р°Р»РіРѕСЂРёС‚Рј.
+	ExecutionState * currentState = startState;	// Р’РµСЂС€РёРЅР° СЃ РјРёРЅРёРјР°Р»СЊРЅРѕР№ РјРµС‚РєРѕР№.
 	while (currentState != NULL)
 	{
-		// Просматриваем всех соседей текущей вершины.
+		// РџСЂРѕСЃРјР°С‚СЂРёРІР°РµРј РІСЃРµС… СЃРѕСЃРµРґРµР№ С‚РµРєСѓС‰РµР№ РІРµСЂС€РёРЅС‹.
 		for (size_t i = 0; i < currentState->node->edges.size(); i++)
 		{
 			Edge * edge = currentState->node->edges[i];
-			ExecutionState * destState = states[edge->to->name];	// Cостояние, соответствующее конечной вершине ребра.
+			ExecutionState * destState = states[edge->to->name];	// CРѕСЃС‚РѕСЏРЅРёРµ, СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРµ РєРѕРЅРµС‡РЅРѕР№ РІРµСЂС€РёРЅРµ СЂРµР±СЂР°.
 
-			// Перезаписываем путь до конечной вершины текущей дуги.
+			// РџРµСЂРµР·Р°РїРёСЃС‹РІР°РµРј РїСѓС‚СЊ РґРѕ РєРѕРЅРµС‡РЅРѕР№ РІРµСЂС€РёРЅС‹ С‚РµРєСѓС‰РµР№ РґСѓРіРё.
 			if (currentState->totalWeight != -1 && (destState->totalWeight == -1 || destState->totalWeight > currentState->totalWeight + edge->weight))
 			{
 				destState->path = currentState->path;
@@ -247,11 +247,11 @@ ExecutionState Graph::run(const char * fileNamePrefix, std::vector<std::string> 
 				destState->totalWeight = currentState->totalWeight + edge->weight;
 			}
 
-			// Генерируем файл в середине выполнения алгоритма.
+			// Р“РµРЅРµСЂРёСЂСѓРµРј С„Р°Р№Р» РІ СЃРµСЂРµРґРёРЅРµ РІС‹РїРѕР»РЅРµРЅРёСЏ Р°Р»РіРѕСЂРёС‚РјР°.
 			dotFilesGenerated->push_back(generateDotCodeForStep(fileNamePrefix, &stepCount, &states, edge));
 
 		}
-		// Помечаем вершину как пройденную и выбираем новую вершину с минимальной меткой.
+		// РџРѕРјРµС‡Р°РµРј РІРµСЂС€РёРЅСѓ РєР°Рє РїСЂРѕР№РґРµРЅРЅСѓСЋ Рё РІС‹Р±РёСЂР°РµРј РЅРѕРІСѓСЋ РІРµСЂС€РёРЅСѓ СЃ РјРёРЅРёРјР°Р»СЊРЅРѕР№ РјРµС‚РєРѕР№.
 		currentState->passed = true;
 		currentState = NULL;
 		for (std::map<std::string, ExecutionState *>::const_iterator iter = states.cbegin(); iter != states.cend(); iter++)
@@ -259,28 +259,28 @@ ExecutionState Graph::run(const char * fileNamePrefix, std::vector<std::string> 
 			ExecutionState * tmp = iter->second;
 			if (!tmp->passed)
 			{
-				// Выбираем текущую вершину, если она пока что равна NULL или найдена вершина с меньшей меткой.
+				// Р’С‹Р±РёСЂР°РµРј С‚РµРєСѓС‰СѓСЋ РІРµСЂС€РёРЅСѓ, РµСЃР»Рё РѕРЅР° РїРѕРєР° С‡С‚Рѕ СЂР°РІРЅР° NULL РёР»Рё РЅР°Р№РґРµРЅР° РІРµСЂС€РёРЅР° СЃ РјРµРЅСЊС€РµР№ РјРµС‚РєРѕР№.
 				if (currentState == NULL ||
 					(tmp->totalWeight != -1 && currentState->totalWeight > tmp->totalWeight) ||
 					(currentState->totalWeight == -1 && tmp->totalWeight != -1))
 					currentState = tmp;
 			}
 		}
-		// Генерируем файл после прохождения очередной вершины.
+		// Р“РµРЅРµСЂРёСЂСѓРµРј С„Р°Р№Р» РїРѕСЃР»Рµ РїСЂРѕС…РѕР¶РґРµРЅРёСЏ РѕС‡РµСЂРµРґРЅРѕР№ РІРµСЂС€РёРЅС‹.
 		dotFilesGenerated->push_back(generateDotCodeForStep(fileNamePrefix, &stepCount, &states, NULL));
 	}
 
-	// Формируем результат.
+	// Р¤РѕСЂРјРёСЂСѓРµРј СЂРµР·СѓР»СЊС‚Р°С‚.
 	ExecutionState result;
 	for (std::map<std::string, ExecutionState *>::const_iterator iter = states.cbegin(); iter != states.cend(); iter++)
 		if (!iter->second->path.empty() && iter->second->path.front()->from == startNode && iter->second->path.back()->to == endNode)
 			result = *iter->second;
 
-	// Генерируем файл, в котором отображается оптимальный путь.
+	// Р“РµРЅРµСЂРёСЂСѓРµРј С„Р°Р№Р», РІ РєРѕС‚РѕСЂРѕРј РѕС‚РѕР±СЂР°Р¶Р°РµС‚СЃСЏ РѕРїС‚РёРјР°Р»СЊРЅС‹Р№ РїСѓС‚СЊ.
 	if (result.path.size() > 0)
 		dotFilesGenerated->push_back(generateDotCodeForResult(fileNamePrefix, &stepCount, &states, &result));
 
-	//  Очищаем выделенную память.
+	//  РћС‡РёС‰Р°РµРј РІС‹РґРµР»РµРЅРЅСѓСЋ РїР°РјСЏС‚СЊ.
 	for (std::map<std::string, ExecutionState *>::const_iterator iter = states.cbegin(); iter != states.cend(); iter++)
 		delete iter->second;
 
@@ -297,7 +297,7 @@ std::string Graph::generateDotCodeForStep(const char * fileNamePrefix, int * ste
 		return std::string("");
 
 	fprintf_s(file, "digraph {\nrankdir = LR;\n");
-	// Задаем узлы.
+	// Р—Р°РґР°РµРј СѓР·Р»С‹.
 	std::map<std::string, std::string> nodestrings;
 	for (std::map<std::string, ExecutionState *>::const_iterator iter = states->cbegin(); iter != states->cend(); iter++)
 	{
@@ -305,14 +305,14 @@ std::string Graph::generateDotCodeForStep(const char * fileNamePrefix, int * ste
 		sprintf_s(tmp, 256, "\"%s\\n len=%I64d\"", state->node->name.c_str(), state->totalWeight);
 		nodestrings.insert(std::pair<std::string, std::string>(state->node->name.c_str(), std::string(tmp)));
 
-		// Записываем узел в файл, выделяя пройденное состояние пунктиром.
+		// Р—Р°РїРёСЃС‹РІР°РµРј СѓР·РµР» РІ С„Р°Р№Р», РІС‹РґРµР»СЏСЏ РїСЂРѕР№РґРµРЅРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ РїСѓРЅРєС‚РёСЂРѕРј.
 		std::string wr(tmp);
 		if (state->passed)
 			wr.append("[style=dotted]");
 		wr.append(";");
 		fprintf_s(file, "%s\n", wr.c_str());
 	}
-	// Задаем переходы.
+	// Р—Р°РґР°РµРј РїРµСЂРµС…РѕРґС‹.
 	for (std::map<std::string, ExecutionState *>::const_iterator iter = states->cbegin(); iter != states->cend(); iter++)
 	{
 		ExecutionState * state = iter->second;
@@ -322,11 +322,11 @@ std::string Graph::generateDotCodeForStep(const char * fileNamePrefix, int * ste
 			std::string wr = nodestrings.find(edges[j]->from->name)->second + " -> " + nodestrings.find(edges[j]->to->name)->second;
 
 			if (edges[j] == currentEdge)
-				sprintf_s(tmp, 256, "[label=\"%I64d\", color=red];", edges[j]->weight);		// Выделяем текущую дугу красным цветом.
+				sprintf_s(tmp, 256, "[label=\"%I64d\", color=red];", edges[j]->weight);		// Р’С‹РґРµР»СЏРµРј С‚РµРєСѓС‰СѓСЋ РґСѓРіСѓ РєСЂР°СЃРЅС‹Рј С†РІРµС‚РѕРј.
 			else if (states->find(edges[j]->from->name)->second->passed)
-				sprintf_s(tmp, 256, "[label=\"%I64d\", color=blue];", edges[j]->weight);	// Выделяем пройденную дугу синим цветом.
+				sprintf_s(tmp, 256, "[label=\"%I64d\", color=blue];", edges[j]->weight);	// Р’С‹РґРµР»СЏРµРј РїСЂРѕР№РґРµРЅРЅСѓСЋ РґСѓРіСѓ СЃРёРЅРёРј С†РІРµС‚РѕРј.
 			else
-				sprintf_s(tmp, 256, "[label=\"%I64d\"];", edges[j]->weight);				// Остальные дуги никак не выделяем.
+				sprintf_s(tmp, 256, "[label=\"%I64d\"];", edges[j]->weight);				// РћСЃС‚Р°Р»СЊРЅС‹Рµ РґСѓРіРё РЅРёРєР°Рє РЅРµ РІС‹РґРµР»СЏРµРј.
 
 			wr.append(tmp);
 			fprintf_s(file, "%s\n", wr.c_str());
@@ -347,7 +347,7 @@ std::string Graph::generateDotCodeForResult(const char * fileNamePrefix, int * s
 		return std::string("");
 
 	fprintf_s(file, "digraph {\nrankdir = LR;\n");
-	// Задаем узлы.
+	// Р—Р°РґР°РµРј СѓР·Р»С‹.
 	std::map<std::string, std::string> nodestrings;
 	for (std::map<std::string, ExecutionState *>::const_iterator iter = states->cbegin(); iter != states->cend(); iter++)
 	{
@@ -355,12 +355,12 @@ std::string Graph::generateDotCodeForResult(const char * fileNamePrefix, int * s
 		sprintf_s(tmp, 256, "\"%s\\n len=%I64d\"", state->node->name.c_str(), state->totalWeight);
 		nodestrings.insert(std::pair<std::string, std::string>(state->node->name.c_str(), std::string(tmp)));
 
-		// Записываем узел в файл.
+		// Р—Р°РїРёСЃС‹РІР°РµРј СѓР·РµР» РІ С„Р°Р№Р».
 		std::string wr(tmp);
 		wr.append(";");
 		fprintf_s(file, "%s\n", wr.c_str());
 	}
-	// Задаем переходы.
+	// Р—Р°РґР°РµРј РїРµСЂРµС…РѕРґС‹.
 	for (std::map<std::string, ExecutionState *>::const_iterator iter = states->cbegin(); iter != states->cend(); iter++)
 	{
 		ExecutionState * state = iter->second;
@@ -369,14 +369,14 @@ std::string Graph::generateDotCodeForResult(const char * fileNamePrefix, int * s
 		{
 			std::string wr = nodestrings.find(edges[j]->from->name)->second + " -> " + nodestrings.find(edges[j]->to->name)->second;
 
-			// Принадлежит ли дуга результирующему пути?
+			// РџСЂРёРЅР°РґР»РµР¶РёС‚ Р»Рё РґСѓРіР° СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРјСѓ РїСѓС‚Рё?
 			bool belongsToResult = false;
 			for (size_t k = 0; !belongsToResult && k < result->path.size(); k++)
 				if (result->path[k] == edges[j])
 					belongsToResult = true;
 
 			if (belongsToResult)
-				sprintf_s(tmp, 256, "[label=\"%I64d\", color=magenta];", edges[j]->weight);	// Выделяем дугу, принадлежащую пути, зеленым цветом.
+				sprintf_s(tmp, 256, "[label=\"%I64d\", color=magenta];", edges[j]->weight);	// Р’С‹РґРµР»СЏРµРј РґСѓРіСѓ, РїСЂРёРЅР°РґР»РµР¶Р°С‰СѓСЋ РїСѓС‚Рё, Р·РµР»РµРЅС‹Рј С†РІРµС‚РѕРј.
 			else
 				sprintf_s(tmp, 256, "[label=\"%I64d\"];", edges[j]->weight);
 

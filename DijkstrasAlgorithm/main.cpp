@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 	{
 		if (G->error_exists())
 		{
-			// Пишем в файл найденные ошибки.
+			// РџРёС€РµРј РІ С„Р°Р№Р» РЅР°Р№РґРµРЅРЅС‹Рµ РѕС€РёР±РєРё.
 			printf("Errors found:\n");
 			std::vector<int> errors = G->getErrors();
 			fprintf_s(file, "fail\n%d\n", (int)errors.size());
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			// Пишем в файл результаты работы алгоритма.
+			// РџРёС€РµРј РІ С„Р°Р№Р» СЂРµР·СѓР»СЊС‚Р°С‚С‹ СЂР°Р±РѕС‚С‹ Р°Р»РіРѕСЂРёС‚РјР°.
 			std::vector<std::string> * dotFilesGenerated = new std::vector<std::string>;
 			ExecutionState result = G->run(argv[3], dotFilesGenerated);
 			fprintf_s(file, "success\n%d\n%d\n", (int)dotFilesGenerated->size(), (int)result.path.size());

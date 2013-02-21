@@ -41,16 +41,16 @@ class GUI : public QMainWindow
 
 private:
 	Ui::GUIClass ui;
-	QString dotExeFileName;			// Абсолютный путь к dot.exe.
-	QString appPath;				// Абсолютный путь до исполняемого файла.
-	QVector<QString> images;		// Сгенерированные картинки для текущего введенного графа.
-	int currentImage;				// Индекс текущей картинки.
-	ScalableGraphicsView * gvGraph;	// Масштабируемый QGraphicsView.
-	QGraphicsScene * scene;			// Для показа картинок.
-	QGridLayout * gvLayout;			// Компоновщик для gvGraph.
-	bool dotPathSetManually;		// Указан ли путь до dot.exe вручную.
-	QRegExpValidator validator;		// Валидатор на вершины.
-	QString lastRoute[2];			// Начало и конец найденного маршрута.
+	QString dotExeFileName;			// РђР±СЃРѕР»СЋС‚РЅС‹Р№ РїСѓС‚СЊ Рє dot.exe.
+	QString appPath;				// РђР±СЃРѕР»СЋС‚РЅС‹Р№ РїСѓС‚СЊ РґРѕ РёСЃРїРѕР»РЅСЏРµРјРѕРіРѕ С„Р°Р№Р»Р°.
+	QVector<QString> images;		// РЎРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅС‹Рµ РєР°СЂС‚РёРЅРєРё РґР»СЏ С‚РµРєСѓС‰РµРіРѕ РІРІРµРґРµРЅРЅРѕРіРѕ РіСЂР°С„Р°.
+	int currentImage;				// РРЅРґРµРєСЃ С‚РµРєСѓС‰РµР№ РєР°СЂС‚РёРЅРєРё.
+	ScalableGraphicsView * gvGraph;	// РњР°СЃС€С‚Р°Р±РёСЂСѓРµРјС‹Р№ QGraphicsView.
+	QGraphicsScene * scene;			// Р”Р»СЏ РїРѕРєР°Р·Р° РєР°СЂС‚РёРЅРѕРє.
+	QGridLayout * gvLayout;			// РљРѕРјРїРѕРЅРѕРІС‰РёРє РґР»СЏ gvGraph.
+	bool dotPathSetManually;		// РЈРєР°Р·Р°РЅ Р»Рё РїСѓС‚СЊ РґРѕ dot.exe РІСЂСѓС‡РЅСѓСЋ.
+	QRegExpValidator validator;		// Р’Р°Р»РёРґР°С‚РѕСЂ РЅР° РІРµСЂС€РёРЅС‹.
+	QString lastRoute[2];			// РќР°С‡Р°Р»Рѕ Рё РєРѕРЅРµС† РЅР°Р№РґРµРЅРЅРѕРіРѕ РјР°СЂС€СЂСѓС‚Р°.
 
 	bool validateFormat(QList<QString> * lines);
 	void cleanUp();

@@ -63,7 +63,7 @@ GUI::GUI(QWidget *parent, Qt::WFlags flags)
 	connect(ui.btnMenuAlgorithm, SIGNAL(triggered(bool)), this, SLOT(btnMenuAlgorithm_triggered(bool)));
 	connect(ui.btnMenuAbout, SIGNAL(triggered(bool)), this, SLOT(btnMenuAbout_triggered(bool)));
 
-	// Загружаем настройки.
+	// Р—Р°РіСЂСѓР¶Р°РµРј РЅР°СЃС‚СЂРѕР№РєРё.
 	appPath = QCoreApplication::applicationDirPath() + QDir::separator();
 	dotExeFileName = "";
 	dotPathSetManually = false;
@@ -76,8 +76,8 @@ GUI::GUI(QWidget *parent, Qt::WFlags flags)
 	}
 	if (!QFile::exists(dotExeFileName))
 	{
-		QMessageBox::warning(NULL, QString("Предупреждение"), QString("Не найден файл dot.exe библиотеки GraphViz. Укажите его местоположение."));
-		dotExeFileName = QFileDialog::getOpenFileName(this, QString("Местоположение файла dot.exe"), QString(""), QString("dot.exe"), 0, 0);
+		QMessageBox::warning(NULL, QString("РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ"), QString("РќРµ РЅР°Р№РґРµРЅ С„Р°Р№Р» dot.exe Р±РёР±Р»РёРѕС‚РµРєРё GraphViz. РЈРєР°Р¶РёС‚Рµ РµРіРѕ РјРµСЃС‚РѕРїРѕР»РѕР¶РµРЅРёРµ."));
+		dotExeFileName = QFileDialog::getOpenFileName(this, QString("РњРµСЃС‚РѕРїРѕР»РѕР¶РµРЅРёРµ С„Р°Р№Р»Р° dot.exe"), QString(""), QString("dot.exe"), 0, 0);
 		dotPathSetManually = true;
 	}
 	qsrand((unsigned int)time(NULL));
@@ -91,7 +91,7 @@ GUI::~GUI()
 	layout()->removeWidget(gvGraph);
 	delete gvGraph;
 	delete gvLayout;
-	// Сохраняем настройки.
+	// РЎРѕС…СЂР°РЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєРё.
 	QSettings settings(appPath + QString("settings.ini"), QSettings::IniFormat);
 	if (dotPathSetManually)
 		settings.setValue(QString("Main/dotpath"), dotExeFileName);
@@ -113,7 +113,7 @@ bool GUI::validateFormat(QList<QString> * lines)
 		QString line = doc->findBlockByLineNumber(i).text();
 		if (line != QString(""))
 		{
-			// Строка должна соответствовать шаблону \s*([^ ]+)\s+([^ ]+)\s+(-?\d)\s*
+			// РЎС‚СЂРѕРєР° РґРѕР»Р¶РЅР° СЃРѕРѕС‚РІРµС‚СЃС‚РІРѕРІР°С‚СЊ С€Р°Р±Р»РѕРЅСѓ \s*([^ ]+)\s+([^ ]+)\s+(-?\d)\s*
 			if (regex.exactMatch(line))
 			{
 				if (lines != NULL)
@@ -128,7 +128,7 @@ bool GUI::validateFormat(QList<QString> * lines)
 
 void GUI::cleanUp()
 {
-	// Удаляем сгенерированные картинки.
+	// РЈРґР°Р»СЏРµРј СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅС‹Рµ РєР°СЂС‚РёРЅРєРё.
 	for (QVector<QString>::const_iterator iter = images.constBegin(); iter != images.constEnd(); iter++)
 		_unlink((*iter).toLocal8Bit().data());
 	images.clear();
@@ -165,7 +165,7 @@ bool GUI::removeDir(const QString & dirName)
 
 void GUI::btnShowGraph_clicked(bool checked)
 {
-	QList<QString> lines;	// Непустые строки из содержимого TextEdit.
+	QList<QString> lines;	// РќРµРїСѓСЃС‚С‹Рµ СЃС‚СЂРѕРєРё РёР· СЃРѕРґРµСЂР¶РёРјРѕРіРѕ TextEdit.
 
 	enableButtons(false, false, false, false);
 	if (scene != NULL)
@@ -173,16 +173,16 @@ void GUI::btnShowGraph_clicked(bool checked)
 	scene = new QGraphicsScene(parent());
 	gvGraph->setScene(scene);
 
-	// Если найдены ошибки в формате - выходим.
+	// Р•СЃР»Рё РЅР°Р№РґРµРЅС‹ РѕС€РёР±РєРё РІ С„РѕСЂРјР°С‚Рµ - РІС‹С…РѕРґРёРј.
 	if (!validateFormat(&lines))
 	{
-		QMessageBox::warning(NULL, QString("Ошибка"), QString("Список дуг не соответствует формату x y w."));
+		QMessageBox::warning(NULL, QString("РћС€РёР±РєР°"), QString("РЎРїРёСЃРѕРє РґСѓРі РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ С„РѕСЂРјР°С‚Сѓ x y w."));
 		return;
 	}
 	if (lines.size() == 0)
 		return;
 
-	// Генерируем dot-файл.
+	// Р“РµРЅРµСЂРёСЂСѓРµРј dot-С„Р°Р№Р».
 	QString tmpFileName = appPath + QString("tmp.dot");
 	FILE * file;
 	if (fopen_s(&file, tmpFileName.toLocal8Bit().data(), "w"))
@@ -208,7 +208,7 @@ void GUI::btnShowGraph_clicked(bool checked)
 
 void GUI::btnSearch_clicked(bool checked)
 {
-	QList<QString> lines;	// Непустые строки из содержимого TextEdit.
+	QList<QString> lines;	// РќРµРїСѓСЃС‚С‹Рµ СЃС‚СЂРѕРєРё РёР· СЃРѕРґРµСЂР¶РёРјРѕРіРѕ TextEdit.
 
 	enableButtons(false, false, false, false);
 	if (scene != NULL)
@@ -216,17 +216,17 @@ void GUI::btnSearch_clicked(bool checked)
 	scene = new QGraphicsScene(parent());
 	gvGraph->setScene(scene);
 
-	// Если найдены ошибки в формате - выходим.
+	// Р•СЃР»Рё РЅР°Р№РґРµРЅС‹ РѕС€РёР±РєРё РІ С„РѕСЂРјР°С‚Рµ - РІС‹С…РѕРґРёРј.
 	if (!validateFormat(&lines))
 	{
-		QMessageBox::warning(NULL, QString("Ошибка"), QString("Список дуг не соответствует формату x y w."));
+		QMessageBox::warning(NULL, QString("РћС€РёР±РєР°"), QString("РЎРїРёСЃРѕРє РґСѓРі РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ С„РѕСЂРјР°С‚Сѓ x y w."));
 		return;
 	}
 	if (lines.size() == 0)
 		return;
 	if (ui.leStartVertex->text() == ui.leEndVertex->text())
 	{
-		QMessageBox::warning(NULL, QString("Ошибка"), QString("Начальная и конечная вершины маршрута совпадают."));
+		QMessageBox::warning(NULL, QString("РћС€РёР±РєР°"), QString("РќР°С‡Р°Р»СЊРЅР°СЏ Рё РєРѕРЅРµС‡РЅР°СЏ РІРµСЂС€РёРЅС‹ РјР°СЂС€СЂСѓС‚Р° СЃРѕРІРїР°РґР°СЋС‚."));
 		return;
 	}
 
@@ -234,12 +234,12 @@ void GUI::btnSearch_clicked(bool checked)
 	lastRoute[0] = ui.leStartVertex->text();
 	lastRoute[1] = ui.leEndVertex->text();
 
-	// Генерация входного файла для консольного приложения с алгоритмом.
+	// Р“РµРЅРµСЂР°С†РёСЏ РІС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р° РґР»СЏ РєРѕРЅСЃРѕР»СЊРЅРѕРіРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ СЃ Р°Р»РіРѕСЂРёС‚РјРѕРј.
 	QString inputFileName = appPath + QString("in.txt");
 	FILE * file;
 	if (fopen_s(&file, inputFileName.toLocal8Bit().data(), "w") != 0)
 	{
-		QMessageBox::warning(NULL, QString("Ошибка"), QString("Не удалось сгенерировать входной файл для работы алгоритма."));
+		QMessageBox::warning(NULL, QString("РћС€РёР±РєР°"), QString("РќРµ СѓРґР°Р»РѕСЃСЊ СЃРіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ РІС…РѕРґРЅРѕР№ С„Р°Р№Р» РґР»СЏ СЂР°Р±РѕС‚С‹ Р°Р»РіРѕСЂРёС‚РјР°."));
 		return;
 	}
 	fprintf_s(file, "%I64d\n%s %s\n", (__int64)lines.size(), lastRoute[0].toLocal8Bit().data(), lastRoute[1].toLocal8Bit().data());
@@ -247,7 +247,7 @@ void GUI::btnSearch_clicked(bool checked)
 		fprintf_s(file, "%s\n", iter->toLocal8Bit().data());
 	fclose(file);
 
-	// Запуск алгоритма.
+	// Р—Р°РїСѓСЃРє Р°Р»РіРѕСЂРёС‚РјР°.
 	QString daExeFileName = appPath + QString("DijkstrasAlgorithm.exe");
 	QString outputFileName = appPath + QString("out.txt");
 	QString prefixFileName = appPath + QString("step");
@@ -256,11 +256,11 @@ void GUI::btnSearch_clicked(bool checked)
 	QProcess::execute(daExeFileName, args);
 	_unlink(inputFileName.toLocal8Bit().data());
 
-	// Подготовка данных для визуализации.
-	statusBar()->showMessage(QString("Выполнение алгоритма..."));
+	// РџРѕРґРіРѕС‚РѕРІРєР° РґР°РЅРЅС‹С… РґР»СЏ РІРёР·СѓР°Р»РёР·Р°С†РёРё.
+	statusBar()->showMessage(QString("Р’С‹РїРѕР»РЅРµРЅРёРµ Р°Р»РіРѕСЂРёС‚РјР°..."));
 	if (fopen_s(&file, outputFileName.toLocal8Bit().data(), "r") != 0)
 	{
-		statusBar()->showMessage(QString("Не удалось открыть файл с результатами работы алгоритма."));
+		statusBar()->showMessage(QString("РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р» СЃ СЂРµР·СѓР»СЊС‚Р°С‚Р°РјРё СЂР°Р±РѕС‚С‹ Р°Р»РіРѕСЂРёС‚РјР°."));
 		return;
 	}
 	char buf[256] = "";
@@ -270,7 +270,7 @@ void GUI::btnSearch_clicked(bool checked)
 	buf[strlen(buf) - 1] = '\0';
 	if (strcmp(buf, "fail") == 0)
 	{
-		// Выводим сообщение об ошибках.
+		// Р’С‹РІРѕРґРёРј СЃРѕРѕР±С‰РµРЅРёРµ РѕР± РѕС€РёР±РєР°С….
 		QString errors;
 		for (int i = 0; i < linesCount; i++)
 		{
@@ -280,16 +280,16 @@ void GUI::btnSearch_clicked(bool checked)
 				errors += QString("\n");
 		}
 		statusBar()->showMessage(QString(""));
-		QMessageBox::warning(NULL, QString("Ошибки во входных данных."), errors);
+		QMessageBox::warning(NULL, QString("РћС€РёР±РєРё РІРѕ РІС…РѕРґРЅС‹С… РґР°РЅРЅС‹С…."), errors);
 	}
 	else
 	{
 		int pathSize = 0;
 		fscanf_s(file, "%d\n", &pathSize);
-		// Визуализируем шаги алгоритма.
+		// Р’РёР·СѓР°Р»РёР·РёСЂСѓРµРј С€Р°РіРё Р°Р»РіРѕСЂРёС‚РјР°.
 		for (int i = 0; i < linesCount; i++)
 		{
-			statusBar()->showMessage(QString("Подготовка шага алгоритма: ") + QString::number(i + 1) + QString(" из ") + QString::number(linesCount));
+			statusBar()->showMessage(QString("РџРѕРґРіРѕС‚РѕРІРєР° С€Р°РіР° Р°Р»РіРѕСЂРёС‚РјР°: ") + QString::number(i + 1) + QString(" РёР· ") + QString::number(linesCount));
 			fgets(buf, 256, file);
 			buf[strlen(buf) - 1] = '\0';
 			QStringList args;
@@ -299,10 +299,10 @@ void GUI::btnSearch_clicked(bool checked)
 			images.push_back(QString(buf) + QString(".png"));
 		}
 		if (pathSize == 0)
-			statusBar()->showMessage(QString("Путь не найден."));
+			statusBar()->showMessage(QString("РџСѓС‚СЊ РЅРµ РЅР°Р№РґРµРЅ."));
 		else
-			statusBar()->showMessage(QString("Путь найден"));
-		// Показываем начальный шаг.
+			statusBar()->showMessage(QString("РџСѓС‚СЊ РЅР°Р№РґРµРЅ"));
+		// РџРѕРєР°Р·С‹РІР°РµРј РЅР°С‡Р°Р»СЊРЅС‹Р№ С€Р°Рі.
 		scene->addPixmap(QPixmap(images[0]));
 		btnToTheBeginning_clicked(false);
 	}
@@ -364,13 +364,13 @@ void GUI::btnToTheEnd_clicked(bool checked)
 
 void GUI::btnMenuOpen_triggered(bool checked)
 {
-	QString fileName = QFileDialog::getOpenFileName(this, QString("Открыть граф"), QString(""), QString("Файл описания графа (*.graph)"), 0, 0);
+	QString fileName = QFileDialog::getOpenFileName(this, QString("РћС‚РєСЂС‹С‚СЊ РіСЂР°С„"), QString(""), QString("Р¤Р°Р№Р» РѕРїРёСЃР°РЅРёСЏ РіСЂР°С„Р° (*.graph)"), 0, 0);
 	if (fileName == QString(""))
 		return;
 	QFile file(fileName);
 	if (!file.open(QIODevice::ReadOnly))
 	{
-		QMessageBox::warning(NULL, QString("Ошибка"), QString("Не удалось открыть файл."));
+		QMessageBox::warning(NULL, QString("РћС€РёР±РєР°"), QString("РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р»."));
 		return;
 	}
 	QTextStream stream(&file);
@@ -384,18 +384,18 @@ void GUI::btnMenuOpen_triggered(bool checked)
 
 void GUI::btnMenuSave_triggered(bool checked)
 {
-	QString fileName = QFileDialog::getSaveFileName(this, QString("Сохранить граф"), QString(""), QString("Файл описания графа (*.graph)"), 0, 0);
+	QString fileName = QFileDialog::getSaveFileName(this, QString("РЎРѕС…СЂР°РЅРёС‚СЊ РіСЂР°С„"), QString(""), QString("Р¤Р°Р№Р» РѕРїРёСЃР°РЅРёСЏ РіСЂР°С„Р° (*.graph)"), 0, 0);
 	if (fileName == QString(""))
 		return;
 	QFile file(fileName);
 	if (!file.open(QIODevice::WriteOnly))
 	{
-		QMessageBox::warning(NULL, QString("Ошибка"), QString("Не удалось сохранить файл."));
+		QMessageBox::warning(NULL, QString("РћС€РёР±РєР°"), QString("РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ С„Р°Р№Р»."));
 		return;
 	}
 	QTextStream stream(&file);
-	QTextDocument * doc = ui.teGraph->document();	// Содержимое TextEdit.
-	QList<QString> lines;							// Непустые строки из содержимого TextEdit.
+	QTextDocument * doc = ui.teGraph->document();	// РЎРѕРґРµСЂР¶РёРјРѕРµ TextEdit.
+	QList<QString> lines;							// РќРµРїСѓСЃС‚С‹Рµ СЃС‚СЂРѕРєРё РёР· СЃРѕРґРµСЂР¶РёРјРѕРіРѕ TextEdit.
 	for (int i = 0; i < doc->lineCount(); i++)
 	{
 		QString line = doc->findBlockByLineNumber(i).text();
@@ -412,20 +412,20 @@ void GUI::btnMenuCreateReport_triggered(bool checked)
 {
 	if (images.size() < 2)
 	{
-		QMessageBox::information(NULL, QString("Нет данных для отчета"), QString("Для создания отчета необходимо сначала найти кратчайший путь."));
+		QMessageBox::information(NULL, QString("РќРµС‚ РґР°РЅРЅС‹С… РґР»СЏ РѕС‚С‡РµС‚Р°"), QString("Р”Р»СЏ СЃРѕР·РґР°РЅРёСЏ РѕС‚С‡РµС‚Р° РЅРµРѕР±С…РѕРґРёРјРѕ СЃРЅР°С‡Р°Р»Р° РЅР°Р№С‚Рё РєСЂР°С‚С‡Р°Р№С€РёР№ РїСѓС‚СЊ."));
 		return;
 	}
-	QString fileName = QFileDialog::getSaveFileName(this, QString("Сохранить отчет"), QString(""), QString("Файл html (*.html)"), 0, 0);
+	QString fileName = QFileDialog::getSaveFileName(this, QString("РЎРѕС…СЂР°РЅРёС‚СЊ РѕС‚С‡РµС‚"), QString(""), QString("Р¤Р°Р№Р» html (*.html)"), 0, 0);
 	if (fileName == QString(""))
 		return;
 	QFile file(fileName);
 	if (!file.open(QIODevice::WriteOnly))
 	{
-		QMessageBox::warning(NULL, QString("Ошибка"), QString("Не удалось сохранить файл."));
+		QMessageBox::warning(NULL, QString("РћС€РёР±РєР°"), QString("РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ С„Р°Р№Р»."));
 		return;
 	}
 	QTextStream stream(&file);
-	// Копируем сгенерированные картинки, случайным образом генерируя имена файлов.
+	// РљРѕРїРёСЂСѓРµРј СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅС‹Рµ РєР°СЂС‚РёРЅРєРё, СЃР»СѓС‡Р°Р№РЅС‹Рј РѕР±СЂР°Р·РѕРј РіРµРЅРµСЂРёСЂСѓСЏ РёРјРµРЅР° С„Р°Р№Р»РѕРІ.
 	QVector<QString> pngFileNames;
 	QFileInfo info(fileName);
 	QString basename = info.baseName();
@@ -455,14 +455,14 @@ void GUI::btnMenuCreateReport_triggered(bool checked)
 	}
 
 	stream << QString("<html>\n	<body>\n");
-	stream << QString("		Поиск кратчайшего марштура из вершины <b>") + lastRoute[0] + QString("</b> в вершину <b>") + lastRoute[1] + QString("</b>:<br/>\n");
+	stream << QString("		РџРѕРёСЃРє РєСЂР°С‚С‡Р°Р№С€РµРіРѕ РјР°СЂС€С‚СѓСЂР° РёР· РІРµСЂС€РёРЅС‹ <b>") + lastRoute[0] + QString("</b> РІ РІРµСЂС€РёРЅСѓ <b>") + lastRoute[1] + QString("</b>:<br/>\n");
 	stream << QString("		<img src=\"") + pngFileNames.first() + QString("\"><br/>\n");
 	for (int i = 1; i < pngFileNames.size() - 1; i++)
 	{
-		stream << QString("		Шаг ") + QString::number(i) + QString(":<br/>\n");
+		stream << QString("		РЁР°Рі ") + QString::number(i) + QString(":<br/>\n");
 		stream << QString("		<img src=\"") + pngFileNames[i] + QString("\"><br/>\n");
 	}
-	stream << QString("		Результат:<br/>\n");
+	stream << QString("		Р РµР·СѓР»СЊС‚Р°С‚:<br/>\n");
 	stream << QString("		<img src=\"") + pngFileNames.last() + QString("\"><br/>\n");
 	stream << QString("	</body>\n</html>");
 	file.close();
@@ -475,29 +475,29 @@ void GUI::btnMenuExit_triggered(bool checked)
 
 void GUI::btnMenuHelp_triggered(bool checked)
 {
-	QMessageBox::information(NULL, QString("Использование программы"),	QString("Граф представляется списком дуг, элемент списка имеет формат <вершина> <вершина> <вес>\n") +
-																		QString("Например, список дуг может иметь вид:\na0 a1 3\na1 a2 2\n\n") +
-																		QString("По нажатию на кнопку \"Показать граф\" появится графическое представление графа в области правее списка дуг.\n") +
-																		QString("По нажатию на кнопку \"Найти кратчайший путь\" будет выполнен алгоритм Дейкстры, шаги которого можно просмотреть в графическом виде.\n") +
-																		QString("Кнопки \"В начало\", \"Предыдущий шаг\", \"Следующий шаг\" и \"В конец\" позволяют прокручивать шаги алгоритма.\n\n") +
-																		QString("Вершины графа имеют имена, при каждой вершине хранится метка len, равная длине пути от начальной вершины до нее. Метка len=-1 означает бесконечную длину пути. ") +
-																		QString("Текущая просматриваемая дуга выделяется красным цветом, просмотренные вершины выделяются пунктиром, а выходящие из них дуги - синим цветом. ") +
-																		QString("На последнем шаге дуги, принадлежащие найденному пути, выделяются фиолетовым цветом.\n") +
-																		QString("Граф можно масштабировать с помощью колеса мыши при зажатой клавише Ctrl.\n") +
-																		QString("Возможно формирование отчета в формате html. Для этого необходимо в главном меню выбрать пункт Файл->Создать отчет в формате html.\n"));
+	QMessageBox::information(NULL, QString("РСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹"),	QString("Р“СЂР°С„ РїСЂРµРґСЃС‚Р°РІР»СЏРµС‚СЃСЏ СЃРїРёСЃРєРѕРј РґСѓРі, СЌР»РµРјРµРЅС‚ СЃРїРёСЃРєР° РёРјРµРµС‚ С„РѕСЂРјР°С‚ <РІРµСЂС€РёРЅР°> <РІРµСЂС€РёРЅР°> <РІРµСЃ>\n") +
+																		QString("РќР°РїСЂРёРјРµСЂ, СЃРїРёСЃРѕРє РґСѓРі РјРѕР¶РµС‚ РёРјРµС‚СЊ РІРёРґ:\na0 a1 3\na1 a2 2\n\n") +
+																		QString("РџРѕ РЅР°Р¶Р°С‚РёСЋ РЅР° РєРЅРѕРїРєСѓ \"РџРѕРєР°Р·Р°С‚СЊ РіСЂР°С„\" РїРѕСЏРІРёС‚СЃСЏ РіСЂР°С„РёС‡РµСЃРєРѕРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ РіСЂР°С„Р° РІ РѕР±Р»Р°СЃС‚Рё РїСЂР°РІРµРµ СЃРїРёСЃРєР° РґСѓРі.\n") +
+																		QString("РџРѕ РЅР°Р¶Р°С‚РёСЋ РЅР° РєРЅРѕРїРєСѓ \"РќР°Р№С‚Рё РєСЂР°С‚С‡Р°Р№С€РёР№ РїСѓС‚СЊ\" Р±СѓРґРµС‚ РІС‹РїРѕР»РЅРµРЅ Р°Р»РіРѕСЂРёС‚Рј Р”РµР№РєСЃС‚СЂС‹, С€Р°РіРё РєРѕС‚РѕСЂРѕРіРѕ РјРѕР¶РЅРѕ РїСЂРѕСЃРјРѕС‚СЂРµС‚СЊ РІ РіСЂР°С„РёС‡РµСЃРєРѕРј РІРёРґРµ.\n") +
+																		QString("РљРЅРѕРїРєРё \"Р’ РЅР°С‡Р°Р»Рѕ\", \"РџСЂРµРґС‹РґСѓС‰РёР№ С€Р°Рі\", \"РЎР»РµРґСѓСЋС‰РёР№ С€Р°Рі\" Рё \"Р’ РєРѕРЅРµС†\" РїРѕР·РІРѕР»СЏСЋС‚ РїСЂРѕРєСЂСѓС‡РёРІР°С‚СЊ С€Р°РіРё Р°Р»РіРѕСЂРёС‚РјР°.\n\n") +
+																		QString("Р’РµСЂС€РёРЅС‹ РіСЂР°С„Р° РёРјРµСЋС‚ РёРјРµРЅР°, РїСЂРё РєР°Р¶РґРѕР№ РІРµСЂС€РёРЅРµ С…СЂР°РЅРёС‚СЃСЏ РјРµС‚РєР° len, СЂР°РІРЅР°СЏ РґР»РёРЅРµ РїСѓС‚Рё РѕС‚ РЅР°С‡Р°Р»СЊРЅРѕР№ РІРµСЂС€РёРЅС‹ РґРѕ РЅРµРµ. РњРµС‚РєР° len=-1 РѕР·РЅР°С‡Р°РµС‚ Р±РµСЃРєРѕРЅРµС‡РЅСѓСЋ РґР»РёРЅСѓ РїСѓС‚Рё. ") +
+																		QString("РўРµРєСѓС‰Р°СЏ РїСЂРѕСЃРјР°С‚СЂРёРІР°РµРјР°СЏ РґСѓРіР° РІС‹РґРµР»СЏРµС‚СЃСЏ РєСЂР°СЃРЅС‹Рј С†РІРµС‚РѕРј, РїСЂРѕСЃРјРѕС‚СЂРµРЅРЅС‹Рµ РІРµСЂС€РёРЅС‹ РІС‹РґРµР»СЏСЋС‚СЃСЏ РїСѓРЅРєС‚РёСЂРѕРј, Р° РІС‹С…РѕРґСЏС‰РёРµ РёР· РЅРёС… РґСѓРіРё - СЃРёРЅРёРј С†РІРµС‚РѕРј. ") +
+																		QString("РќР° РїРѕСЃР»РµРґРЅРµРј С€Р°РіРµ РґСѓРіРё, РїСЂРёРЅР°РґР»РµР¶Р°С‰РёРµ РЅР°Р№РґРµРЅРЅРѕРјСѓ РїСѓС‚Рё, РІС‹РґРµР»СЏСЋС‚СЃСЏ С„РёРѕР»РµС‚РѕРІС‹Рј С†РІРµС‚РѕРј.\n") +
+																		QString("Р“СЂР°С„ РјРѕР¶РЅРѕ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°С‚СЊ СЃ РїРѕРјРѕС‰СЊСЋ РєРѕР»РµСЃР° РјС‹С€Рё РїСЂРё Р·Р°Р¶Р°С‚РѕР№ РєР»Р°РІРёС€Рµ Ctrl.\n") +
+																		QString("Р’РѕР·РјРѕР¶РЅРѕ С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РѕС‚С‡РµС‚Р° РІ С„РѕСЂРјР°С‚Рµ html. Р”Р»СЏ СЌС‚РѕРіРѕ РЅРµРѕР±С…РѕРґРёРјРѕ РІ РіР»Р°РІРЅРѕРј РјРµРЅСЋ РІС‹Р±СЂР°С‚СЊ РїСѓРЅРєС‚ Р¤Р°Р№Р»->РЎРѕР·РґР°С‚СЊ РѕС‚С‡РµС‚ РІ С„РѕСЂРјР°С‚Рµ html.\n"));
 }
 
 void GUI::btnMenuAlgorithm_triggered(bool checked)
 {
-	QMessageBox::information(NULL, QString("Об алгоритме"),	QString("Алгоритм Дейкстры — алгоритм на графах, изобретенный нидерландским ученым Э. Дейкстрой в 1959 году. Находит кратчайшее расстояние от одной из вершин графа до ") +
-															QString("всех остальных. Алгоритм работает только для графов без дуг с отрицательным весом и петель.\n\n") +
-															QString("Инициализация: Метка начальной вершины маршрута полагается равной 0, метки остальных вершин — бесконечности. Это отражает то, что расстояния от начальной вершины до других вершин пока неизвестны. Все вершины графа помечаются как непосещенные.\n\n") +
-															QString("Шаг алгоритма: Если все вершины посещены, алгоритм завершается. В противном случае, из еще не посещенных вершин выбирается вершина u, имеющая минимальную метку. Вершины, в которые ведут ребра из u, назовем соседями этой вершины. ") +
-															QString("Для каждого соседа вершины u, кроме отмеченных как посещенные, рассмотрим новую длину пути, равную сумме значений текущей метки u и длины ребра, соединяющего u с этим соседом. ") +
-															QString("Если полученное значение длины меньше значения метки соседа, заменим значение метки полученным значением длины. Рассмотрев всех соседей, пометим вершину u как посещенную и повторим шаг алгоритма."));
+	QMessageBox::information(NULL, QString("РћР± Р°Р»РіРѕСЂРёС‚РјРµ"),	QString("РђР»РіРѕСЂРёС‚Рј Р”РµР№РєСЃС‚СЂС‹ вЂ” Р°Р»РіРѕСЂРёС‚Рј РЅР° РіСЂР°С„Р°С…, РёР·РѕР±СЂРµС‚РµРЅРЅС‹Р№ РЅРёРґРµСЂР»Р°РЅРґСЃРєРёРј СѓС‡РµРЅС‹Рј Р­. Р”РµР№РєСЃС‚СЂРѕР№ РІ 1959 РіРѕРґСѓ. РќР°С…РѕРґРёС‚ РєСЂР°С‚С‡Р°Р№С€РµРµ СЂР°СЃСЃС‚РѕСЏРЅРёРµ РѕС‚ РѕРґРЅРѕР№ РёР· РІРµСЂС€РёРЅ РіСЂР°С„Р° РґРѕ ") +
+															QString("РІСЃРµС… РѕСЃС‚Р°Р»СЊРЅС‹С…. РђР»РіРѕСЂРёС‚Рј СЂР°Р±РѕС‚Р°РµС‚ С‚РѕР»СЊРєРѕ РґР»СЏ РіСЂР°С„РѕРІ Р±РµР· РґСѓРі СЃ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рј РІРµСЃРѕРј Рё РїРµС‚РµР»СЊ.\n\n") +
+															QString("РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ: РњРµС‚РєР° РЅР°С‡Р°Р»СЊРЅРѕР№ РІРµСЂС€РёРЅС‹ РјР°СЂС€СЂСѓС‚Р° РїРѕР»Р°РіР°РµС‚СЃСЏ СЂР°РІРЅРѕР№ 0, РјРµС‚РєРё РѕСЃС‚Р°Р»СЊРЅС‹С… РІРµСЂС€РёРЅ вЂ” Р±РµСЃРєРѕРЅРµС‡РЅРѕСЃС‚Рё. Р­С‚Рѕ РѕС‚СЂР°Р¶Р°РµС‚ С‚Рѕ, С‡С‚Рѕ СЂР°СЃСЃС‚РѕСЏРЅРёСЏ РѕС‚ РЅР°С‡Р°Р»СЊРЅРѕР№ РІРµСЂС€РёРЅС‹ РґРѕ РґСЂСѓРіРёС… РІРµСЂС€РёРЅ РїРѕРєР° РЅРµРёР·РІРµСЃС‚РЅС‹. Р’СЃРµ РІРµСЂС€РёРЅС‹ РіСЂР°С„Р° РїРѕРјРµС‡Р°СЋС‚СЃСЏ РєР°Рє РЅРµРїРѕСЃРµС‰РµРЅРЅС‹Рµ.\n\n") +
+															QString("РЁР°Рі Р°Р»РіРѕСЂРёС‚РјР°: Р•СЃР»Рё РІСЃРµ РІРµСЂС€РёРЅС‹ РїРѕСЃРµС‰РµРЅС‹, Р°Р»РіРѕСЂРёС‚Рј Р·Р°РІРµСЂС€Р°РµС‚СЃСЏ. Р’ РїСЂРѕС‚РёРІРЅРѕРј СЃР»СѓС‡Р°Рµ, РёР· РµС‰Рµ РЅРµ РїРѕСЃРµС‰РµРЅРЅС‹С… РІРµСЂС€РёРЅ РІС‹Р±РёСЂР°РµС‚СЃСЏ РІРµСЂС€РёРЅР° u, РёРјРµСЋС‰Р°СЏ РјРёРЅРёРјР°Р»СЊРЅСѓСЋ РјРµС‚РєСѓ. Р’РµСЂС€РёРЅС‹, РІ РєРѕС‚РѕСЂС‹Рµ РІРµРґСѓС‚ СЂРµР±СЂР° РёР· u, РЅР°Р·РѕРІРµРј СЃРѕСЃРµРґСЏРјРё СЌС‚РѕР№ РІРµСЂС€РёРЅС‹. ") +
+															QString("Р”Р»СЏ РєР°Р¶РґРѕРіРѕ СЃРѕСЃРµРґР° РІРµСЂС€РёРЅС‹ u, РєСЂРѕРјРµ РѕС‚РјРµС‡РµРЅРЅС‹С… РєР°Рє РїРѕСЃРµС‰РµРЅРЅС‹Рµ, СЂР°СЃСЃРјРѕС‚СЂРёРј РЅРѕРІСѓСЋ РґР»РёРЅСѓ РїСѓС‚Рё, СЂР°РІРЅСѓСЋ СЃСѓРјРјРµ Р·РЅР°С‡РµРЅРёР№ С‚РµРєСѓС‰РµР№ РјРµС‚РєРё u Рё РґР»РёРЅС‹ СЂРµР±СЂР°, СЃРѕРµРґРёРЅСЏСЋС‰РµРіРѕ u СЃ СЌС‚РёРј СЃРѕСЃРµРґРѕРј. ") +
+															QString("Р•СЃР»Рё РїРѕР»СѓС‡РµРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РґР»РёРЅС‹ РјРµРЅСЊС€Рµ Р·РЅР°С‡РµРЅРёСЏ РјРµС‚РєРё СЃРѕСЃРµРґР°, Р·Р°РјРµРЅРёРј Р·РЅР°С‡РµРЅРёРµ РјРµС‚РєРё РїРѕР»СѓС‡РµРЅРЅС‹Рј Р·РЅР°С‡РµРЅРёРµРј РґР»РёРЅС‹. Р Р°СЃСЃРјРѕС‚СЂРµРІ РІСЃРµС… СЃРѕСЃРµРґРµР№, РїРѕРјРµС‚РёРј РІРµСЂС€РёРЅСѓ u РєР°Рє РїРѕСЃРµС‰РµРЅРЅСѓСЋ Рё РїРѕРІС‚РѕСЂРёРј С€Р°Рі Р°Р»РіРѕСЂРёС‚РјР°."));
 }
 
 void GUI::btnMenuAbout_triggered(bool checked)
 {
-	QMessageBox::information(NULL, QString("О программе"), QString("<p align='center'>Визуализация работы алгоритма Дейкстры.<br><br>Авторы: студенты группы ИВТ-360 Стрельцов В. О., Горемыкин М. В.<br><br>Волгорадский Государственный Технический Университет</center><br>Кафедра ПОАС<br>2012 год</p>"));
+	QMessageBox::information(NULL, QString("Рћ РїСЂРѕРіСЂР°РјРјРµ"), QString("<p align='center'>Р’РёР·СѓР°Р»РёР·Р°С†РёСЏ СЂР°Р±РѕС‚С‹ Р°Р»РіРѕСЂРёС‚РјР° Р”РµР№РєСЃС‚СЂС‹.<br><br>РђРІС‚РѕСЂС‹: СЃС‚СѓРґРµРЅС‚С‹ РіСЂСѓРїРїС‹ РР’Рў-360 РЎС‚СЂРµР»СЊС†РѕРІ Р’. Рћ., Р“РѕСЂРµРјС‹РєРёРЅ Рњ. Р’.<br><br>Р’РѕР»РіРѕСЂР°РґСЃРєРёР№ Р“РѕСЃСѓРґР°СЂСЃС‚РІРµРЅРЅС‹Р№ РўРµС…РЅРёС‡РµСЃРєРёР№ РЈРЅРёРІРµСЂСЃРёС‚РµС‚</center><br>РљР°С„РµРґСЂР° РџРћРђРЎ<br>2012 РіРѕРґ</p>"));
 }

@@ -5,8 +5,8 @@
 class TestSuite
 {
 private:
-	int passCount;	// Количество пройденных тестов.
-	int failCount;	// Количество проваленных тестов.
+	int passCount;	// РљРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕР№РґРµРЅРЅС‹С… С‚РµСЃС‚РѕРІ.
+	int failCount;	// РљРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРІР°Р»РµРЅРЅС‹С… С‚РµСЃС‚РѕРІ.
 
 	void assertTrue(const bool condition, const char * failMessage = "")
 	{
@@ -32,7 +32,7 @@ public:
 		failCount = 0;
 	}
 
-	// Вырожденный случай - граф из единственной вершины.
+	// Р’С‹СЂРѕР¶РґРµРЅРЅС‹Р№ СЃР»СѓС‡Р°Р№ - РіСЂР°С„ РёР· РµРґРёРЅСЃС‚РІРµРЅРЅРѕР№ РІРµСЂС€РёРЅС‹.
 	void test0()
 	{
 		Graph G;
@@ -47,11 +47,11 @@ public:
 		ExecutionState res = G.run("C:\\step", &dotFilesGenerated);
 		cleanUp(dotFilesGenerated);
 
-		assertTrue(res.totalWeight == -1, "Неверная длина пути (тест № 0)");
-		assertTrue(res.path.empty(), "Неверное количество переходов (тест № 0)");
+		assertTrue(res.totalWeight == -1, "РќРµРІРµСЂРЅР°СЏ РґР»РёРЅР° РїСѓС‚Рё (С‚РµСЃС‚ в„– 0)");
+		assertTrue(res.path.empty(), "РќРµРІРµСЂРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРµСЂРµС…РѕРґРѕРІ (С‚РµСЃС‚ в„– 0)");
 	}
 
-	// Граф из двух вершин, из первой идет 2 дуги во вторую с разной длиной
+	// Р“СЂР°С„ РёР· РґРІСѓС… РІРµСЂС€РёРЅ, РёР· РїРµСЂРІРѕР№ РёРґРµС‚ 2 РґСѓРіРё РІРѕ РІС‚РѕСЂСѓСЋ СЃ СЂР°Р·РЅРѕР№ РґР»РёРЅРѕР№
 	void test1()
 	{
 		Graph G;
@@ -68,12 +68,12 @@ public:
 		ExecutionState res = G.run("C:\\step", &dotFilesGenerated);
 		cleanUp(dotFilesGenerated);
 
-		assertTrue(res.totalWeight == 10, "Неверная длина пути (тест № 1)");
-		assertTrue(res.path.size() == 1, "Неверное количество переходов (тест № 1)");
-		assertTrue(res.path[0]->weight == 10, "Неправильный переход (тест № 1)");
+		assertTrue(res.totalWeight == 10, "РќРµРІРµСЂРЅР°СЏ РґР»РёРЅР° РїСѓС‚Рё (С‚РµСЃС‚ в„– 1)");
+		assertTrue(res.path.size() == 1, "РќРµРІРµСЂРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРµСЂРµС…РѕРґРѕРІ (С‚РµСЃС‚ в„– 1)");
+		assertTrue(res.path[0]->weight == 10, "РќРµРїСЂР°РІРёР»СЊРЅС‹Р№ РїРµСЂРµС…РѕРґ (С‚РµСЃС‚ в„– 1)");
 	}
 
-	// Тест из описания алгоритма на Википедии.
+	// РўРµСЃС‚ РёР· РѕРїРёСЃР°РЅРёСЏ Р°Р»РіРѕСЂРёС‚РјР° РЅР° Р’РёРєРёРїРµРґРёРё.
 	void test2()
 	{
 		Graph G;
@@ -96,29 +96,29 @@ public:
 		ExecutionState res = G.run("C:\\step", &dotFilesGenerated);
 		cleanUp(dotFilesGenerated);
 
-		assertTrue(res.totalWeight == 11, "Неверная длина пути (тест № 2)");
-		assertTrue(res.path.size() == 2, "Неверное количество переходов (тест № 2)");
-		assertTrue(res.path[0]->weight == 9 && res.path[1]->weight == 2, "Найдены неправильные переходы (тест № 2)");
+		assertTrue(res.totalWeight == 11, "РќРµРІРµСЂРЅР°СЏ РґР»РёРЅР° РїСѓС‚Рё (С‚РµСЃС‚ в„– 2)");
+		assertTrue(res.path.size() == 2, "РќРµРІРµСЂРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРµСЂРµС…РѕРґРѕРІ (С‚РµСЃС‚ в„– 2)");
+		assertTrue(res.path[0]->weight == 9 && res.path[1]->weight == 2, "РќР°Р№РґРµРЅС‹ РЅРµРїСЂР°РІРёР»СЊРЅС‹Рµ РїРµСЂРµС…РѕРґС‹ (С‚РµСЃС‚ в„– 2)");
 
 		G.startNode = G.nodes.find("0")->second;
 		G.endNode = G.nodes.find("3")->second;
 		res = G.run("C:\\step", &dotFilesGenerated);
 		cleanUp(dotFilesGenerated);
 
-		assertTrue(res.totalWeight == 20, "Неверная длина пути (тест № 2)");
-		assertTrue(res.path.size() == 2, "Неверное количество переходов (тест № 2)");
-		assertTrue(res.path[0]->weight == 9 && res.path[1]->weight == 11, "Найдены неправильные переходы (тест № 2)");
+		assertTrue(res.totalWeight == 20, "РќРµРІРµСЂРЅР°СЏ РґР»РёРЅР° РїСѓС‚Рё (С‚РµСЃС‚ в„– 2)");
+		assertTrue(res.path.size() == 2, "РќРµРІРµСЂРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРµСЂРµС…РѕРґРѕРІ (С‚РµСЃС‚ в„– 2)");
+		assertTrue(res.path[0]->weight == 9 && res.path[1]->weight == 11, "РќР°Р№РґРµРЅС‹ РЅРµРїСЂР°РІРёР»СЊРЅС‹Рµ РїРµСЂРµС…РѕРґС‹ (С‚РµСЃС‚ в„– 2)");
 
 		G.startNode = G.nodes.find("5")->second;
 		G.endNode = G.nodes.find("1")->second;
 		res = G.run("C:\\step", &dotFilesGenerated);
 		cleanUp(dotFilesGenerated);
 
-		assertTrue(res.totalWeight == -1, "Неверная длина пути (тест № 2)");
-		assertTrue(res.path.empty(), "Неверное количество переходов (тест № 2)");
+		assertTrue(res.totalWeight == -1, "РќРµРІРµСЂРЅР°СЏ РґР»РёРЅР° РїСѓС‚Рё (С‚РµСЃС‚ в„– 2)");
+		assertTrue(res.path.empty(), "РќРµРІРµСЂРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРµСЂРµС…РѕРґРѕРІ (С‚РµСЃС‚ в„– 2)");
 	}
 
-	// Путь до одной из вершин напрямую длинее, чем в обход.
+	// РџСѓС‚СЊ РґРѕ РѕРґРЅРѕР№ РёР· РІРµСЂС€РёРЅ РЅР°РїСЂСЏРјСѓСЋ РґР»РёРЅРµРµ, С‡РµРј РІ РѕР±С…РѕРґ.
 	void test3()
 	{
 		Graph G;
@@ -137,9 +137,9 @@ public:
 		ExecutionState res = G.run("C:\\step", &dotFilesGenerated);
 		cleanUp(dotFilesGenerated);
 
-		assertTrue(res.totalWeight == 8, "Неверная длина пути (тест № 3)");
-		assertTrue(res.path.size() == 3, "Неверное количество переходов (тест № 3)");
-		assertTrue(res.path[0]->weight == 1 && res.path[1]->weight == 2 && res.path[2]->weight == 5, "Найдены неправильные переходы (тест № 3)");
+		assertTrue(res.totalWeight == 8, "РќРµРІРµСЂРЅР°СЏ РґР»РёРЅР° РїСѓС‚Рё (С‚РµСЃС‚ в„– 3)");
+		assertTrue(res.path.size() == 3, "РќРµРІРµСЂРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРµСЂРµС…РѕРґРѕРІ (С‚РµСЃС‚ в„– 3)");
+		assertTrue(res.path[0]->weight == 1 && res.path[1]->weight == 2 && res.path[2]->weight == 5, "РќР°Р№РґРµРЅС‹ РЅРµРїСЂР°РІРёР»СЊРЅС‹Рµ РїРµСЂРµС…РѕРґС‹ (С‚РµСЃС‚ в„– 3)");
 	}
 
 	void run()
